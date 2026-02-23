@@ -25,3 +25,5 @@ go.work.sum
 # env file
 .env
 
+config.test.toml
+config.viettel.toml
