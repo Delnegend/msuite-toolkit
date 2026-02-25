@@ -13,7 +13,8 @@ import (
 )
 
 func GetUsersDevicesLastIPWithProgress(
-	appState *types.AppState, usersDevices map[types.UserID][]endpoints.DeviceInfo,
+	appState *types.AppState,
+	usersDevices map[types.UserID][]endpoints.DeviceInfo,
 ) map[types.UserID]map[types.DeviceID]types.IPAddress {
 	fmt.Println("Fetching devices last IPs...")
 
