@@ -1,0 +1,22 @@
+{
+    "name": "mobility-suite-toolkit",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "runArgs": [
+        "--cap-add=NET_RAW",
+        "--cap-add=NET_ADMIN"
+    ],
+    "postCreateCommand": "bash .devcontainer/postinstall.sh",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "golang.go",
+                "tamasfe.even-better-toml"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash"
+            }
+        }
+    }
+}
