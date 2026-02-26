@@ -50,11 +50,14 @@ func main() {
 	}
 
 	for _, user := range users {
-		mfa := userMFA[user.UserID]
-		mfaB, err := json.Marshal(mfa)
-		if err != nil {
-			slog.Error("marshalling mfa failed", "err", err)
-			os.Exit(1)
+		mfaB := []byte("{}")
+		if mfa, ok := userMFA[user.UserID]; ok {
+			var err error
+			mfaB, err = json.Marshal(mfa)
+			if err != nil {
+				slog.Error("marshalling mfa failed", "err", err, "userID", user.UserID)
+				os.Exit(1)
+			}
 		}
 
 		devices := userDevices[user.UserID]
