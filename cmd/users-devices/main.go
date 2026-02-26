@@ -39,7 +39,10 @@ func main() {
 
 	// write rows
 	for _, user := range users {
-		devices := userDevices[user.UserID]
+		devices, ok := userDevices[user.UserID]
+		if !ok {
+			continue
+		}
 		for _, device := range devices {
 			if err := w.Write([]string{
 				user.UserID,
