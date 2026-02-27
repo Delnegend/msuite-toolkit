@@ -27,5 +27,6 @@ go.work.sum
 
 config.test.toml
 config.viettel.toml
-
 *.csv
+dist/
+.justfile
