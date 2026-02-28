@@ -1,4 +1,4 @@
-package endpoints
+package get_user_device_last_ip
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"msuite-toolkit/pkg/httpclient"
 	"msuite-toolkit/pkg/types"
 	"net/http"
 	"net/url"
@@ -21,7 +22,7 @@ func GetUserDeviceLastIP(as *types.AppState, userID types.UserID, deviceID types
 	limit := 10
 	offset := 0
 
-	client := getHTTPClient()
+	client := httpclient.GetHTTPClient()
 
 	for {
 		reqPayloadBytes, err := json.Marshal(struct {

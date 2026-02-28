@@ -1,7 +1,6 @@
-package endpoints_test
+package get_user_device_last_ip
 
 import (
-	"msuite-toolkit/pkg/endpoints"
 	"msuite-toolkit/pkg/types"
 	"testing"
 
@@ -19,7 +18,7 @@ func TestGetUserDeviceLastIP(t *testing.T) {
 	t.Logf("Loaded config: admin_portal=%s, admin_user_id=%s, bearer_token_len=%d",
 		appState.AdminPortalAddress, appState.AdminUserID, len(appState.BearerToken))
 
-	ip, err := endpoints.GetUserDeviceLastIP(&appState, TEST_USER_ID, TEST_DEVICE_ID)
+	ip, err := GetUserDeviceLastIP(&appState, TEST_USER_ID, TEST_DEVICE_ID)
 	if err != nil {
 		t.Fatalf("GetUserDeviceLastIP failed: %v", err)
 	}

@@ -1,9 +1,8 @@
-package blocks
+package get_user_mfa
 
 import (
 	"fmt"
 	"log/slog"
-	"msuite-toolkit/pkg/endpoints"
 	"msuite-toolkit/pkg/types"
 	"msuite-toolkit/pkg/utils"
 	"sync"
@@ -12,10 +11,10 @@ import (
 	"github.com/alitto/pond/v2"
 )
 
-func GetUserDevicesWithProgress(appState *types.AppState, users []endpoints.UserInfo) map[types.UserID][]endpoints.DeviceInfo {
-	fmt.Println("Fetching user devices...")
+func GetUsersMFAWithProgress(appState *types.AppState, users []types.UserInfo) map[types.UserID]UserMFAInfo {
+	fmt.Println("Fetching users MFA info...")
 
-	userDeviceMap := make(map[types.UserID][]endpoints.DeviceInfo)
+	userMFA := make(map[types.UserID]UserMFAInfo)
 	var mu sync.Mutex
 
 	// start progress printer
@@ -32,20 +31,20 @@ func GetUserDevicesWithProgress(appState *types.AppState, users []endpoints.User
 
 	totalUsers := len(users)
 	if totalUsers == 0 {
-		// nothing to do; ensure progress shows 100% and clean up
 		select {
 		case progressPercentChan <- 100:
 		default:
 		}
 		close(progressPercentChan)
 		<-donePrinter
-
-		return userDeviceMap
+		return userMFA
 	}
+
 	var completed int32
 	tasks := make([]pond.Task, 0, totalUsers)
 
 	for _, user := range users {
+		u := user
 		task := pool.SubmitErr(func() error {
 			// ensure progress is accounted for even on error
 			defer func() {
@@ -62,12 +61,12 @@ func GetUserDevicesWithProgress(appState *types.AppState, users []endpoints.User
 				}
 			}()
 
-			devices, err := endpoints.GetUserDevices(appState, user.UserID)
+			mfa, err := GetUserMFA(appState, u.UserID)
 			if err != nil {
-				return fmt.Errorf("user %s: %w", user.UserID, err)
+				return fmt.Errorf("user %s: %w", u.UserID, err)
 			}
 			mu.Lock()
-			userDeviceMap[user.UserID] = devices
+			userMFA[u.UserID] = mfa
 			mu.Unlock()
 			return nil
 		})
@@ -96,9 +95,9 @@ func GetUserDevicesWithProgress(appState *types.AppState, users []endpoints.User
 	// print accumulated errors after progress printing finishes
 	if len(errs) > 0 {
 		for _, e := range errs {
-			slog.Error("failed to get devices for a user", "err", e)
+			slog.Error("failed to get MFA for a user", "err", e)
 		}
 	}
 
-	return userDeviceMap
+	return userMFA
 }

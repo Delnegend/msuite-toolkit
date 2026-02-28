@@ -1,4 +1,4 @@
-package endpoints
+package get_users
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"msuite-toolkit/pkg/httpclient"
 	"msuite-toolkit/pkg/types"
 	"net/http"
 	"net/url"
@@ -16,14 +17,9 @@ import (
 	"github.com/alitto/pond/v2"
 )
 
-type UserInfo struct {
-	UserID    string `json:"user_id"`
-	UserEmail string `json:"email"`
-}
-
 // GetUsers fetches a batch of users starting from the given offset with the specified limit.
 // It returns the total count of users, the list of UserInfo, and any error encountered.
-func GetUsers(as *types.AppState, offset int, limit int) (int, []UserInfo, error) {
+func GetUsers(as *types.AppState, offset int, limit int) (int, []types.UserInfo, error) {
 	endpoint := fmt.Sprintf("https://%s/identity-api/v1/domains/default/users", as.AdminPortalAddress)
 
 	reqPayloadBytes, err := json.Marshal(struct {
@@ -51,7 +47,7 @@ func GetUsers(as *types.AppState, offset int, limit int) (int, []UserInfo, error
 	values.Set("request_payload", string(reqPayloadBytes))
 	reqURL := endpoint + "?" + values.Encode()
 
-	client := getHTTPClient()
+	client := httpclient.GetHTTPClient()
 
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, reqURL, nil)
 	if err != nil {
@@ -79,8 +75,8 @@ func GetUsers(as *types.AppState, offset int, limit int) (int, []UserInfo, error
 	}
 
 	var respPayload struct {
-		Data  []UserInfo `json:"data"`
-		Count int        `json:"count"`
+		Data  []types.UserInfo `json:"data"`
+		Count int              `json:"count"`
 	}
 	if err := json.Unmarshal(body, &respPayload); err != nil {
 		slog.Error("unmarshalling response failed", "err", err)
@@ -91,7 +87,7 @@ func GetUsers(as *types.AppState, offset int, limit int) (int, []UserInfo, error
 }
 
 // GetAllUsers fetches all users by making paginated requests.
-func GetAllUsers(as *types.AppState, progressPercentChan chan<- int) ([]UserInfo, error) {
+func GetAllUsers(as *types.AppState, progressPercentChan chan<- int) ([]types.UserInfo, error) {
 	pool := pond.NewPool(16)
 
 	limit := 100
@@ -111,7 +107,7 @@ func GetAllUsers(as *types.AppState, progressPercentChan chan<- int) ([]UserInfo
 		return nil, err
 	}
 
-	users := make([]UserInfo, 0, total)
+	users := make([]types.UserInfo, 0, total)
 	mutex := &sync.Mutex{}
 	users = append(users, firstBatch...)
 

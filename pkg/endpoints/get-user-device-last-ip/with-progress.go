@@ -1,9 +1,8 @@
-package blocks
+package get_user_device_last_ip
 
 import (
 	"fmt"
 	"log/slog"
-	"msuite-toolkit/pkg/endpoints"
 	"msuite-toolkit/pkg/types"
 	"msuite-toolkit/pkg/utils"
 	"sync"
@@ -14,7 +13,7 @@ import (
 
 func GetUsersDevicesLastIPWithProgress(
 	appState *types.AppState,
-	usersDevices map[types.UserID][]endpoints.DeviceInfo,
+	usersDevices map[types.UserID][]types.DeviceInfo,
 ) map[types.UserID]map[types.DeviceID]types.IPAddress {
 	fmt.Println("Fetching devices last IPs...")
 
@@ -70,7 +69,7 @@ func GetUsersDevicesLastIPWithProgress(
 					}
 				}()
 
-				ip, err := endpoints.GetUserDeviceLastIP(appState, userID, deviceID)
+				ip, err := GetUserDeviceLastIP(appState, userID, deviceID)
 				if err != nil {
 					return fmt.Errorf("user %s device %s: %w", userID, deviceID, err)
 				}

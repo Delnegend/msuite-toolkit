@@ -1,4 +1,4 @@
-package endpoints
+package httpclient
 
 import (
 	"crypto/tls"
@@ -13,7 +13,7 @@ var (
 	clientOnce   sync.Once
 )
 
-func getHTTPClient() *http.Client {
+func GetHTTPClient() *http.Client {
 	clientOnce.Do(func() {
 		tr := &http.Transport{
 			TLSClientConfig:     &tls.Config{InsecureSkipVerify: true},

@@ -1,4 +1,4 @@
-package endpoints
+package get_user_apps
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"msuite-toolkit/pkg/httpclient"
 	"msuite-toolkit/pkg/types"
 	"net/http"
 	"net/url"
@@ -24,7 +25,7 @@ func GetUserApps(as *types.AppState, userID string) ([]AppInfo, error) {
 	values.Set("limit", "-1")
 	reqURL := endpoint + "?" + values.Encode()
 
-	client := getHTTPClient()
+	client := httpclient.GetHTTPClient()
 
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, reqURL, nil)
 	if err != nil {

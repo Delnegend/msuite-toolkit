@@ -1,4 +1,4 @@
-package endpoints
+package get_user_devices
 
 import (
 	"context"
@@ -6,33 +6,14 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"msuite-toolkit/pkg/httpclient"
 	"msuite-toolkit/pkg/types"
 	"net/http"
 	"net/url"
-	"time"
 )
 
-type DeviceInfo struct {
-	DeviceID    string
-	DeviceName  string
-	UpdatedTime int64
-
-	OS            string
-	OSFamily      string
-	ProductName   string
-	ProductVendor string
-}
-
-func (d *DeviceInfo) UpdatedTimeString() string {
-	if d.UpdatedTime == 0 {
-		return "Never"
-	}
-	t := time.Unix(d.UpdatedTime, 0)
-	return t.Format("2006-01-02 15:04:05")
-}
-
 // GetUserDevices fetches device basic info for the given user and returns parsed DeviceInfo entries.
-func GetUserDevices(as *types.AppState, userID string) ([]DeviceInfo, error) {
+func GetUserDevices(as *types.AppState, userID string) ([]types.DeviceInfo, error) {
 	endpoint := fmt.Sprintf("https://%s/device-api/v1/domains/default/devices/user/%s/info/basic", as.AdminPortalAddress, userID)
 
 	reqPayloadBytes, err := json.Marshal(struct {
@@ -47,7 +28,7 @@ func GetUserDevices(as *types.AppState, userID string) ([]DeviceInfo, error) {
 	values.Set("request_payload", string(reqPayloadBytes))
 	reqURL := endpoint + "?" + values.Encode()
 
-	client := getHTTPClient()
+	client := httpclient.GetHTTPClient()
 
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, reqURL, nil)
 	if err != nil {
@@ -93,9 +74,9 @@ func GetUserDevices(as *types.AppState, userID string) ([]DeviceInfo, error) {
 		return nil, fmt.Errorf("unmarshalling response failed: %w", err)
 	}
 
-	devices := make([]DeviceInfo, 0, len(respPayload.Data))
+	devices := make([]types.DeviceInfo, 0, len(respPayload.Data))
 	for _, d := range respPayload.Data {
-		devices = append(devices, DeviceInfo{
+		devices = append(devices, types.DeviceInfo{
 			DeviceID:      d.DeviceID,
 			DeviceName:    d.DeviceName,
 			UpdatedTime:   d.UpdatedTime,

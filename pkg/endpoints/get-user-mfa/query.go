@@ -1,4 +1,4 @@
-package endpoints
+package get_user_mfa
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"msuite-toolkit/pkg/httpclient"
 	"msuite-toolkit/pkg/types"
 	"net/http"
 )
@@ -21,7 +22,7 @@ type UserMFAInfo struct {
 func GetUserMFA(as *types.AppState, userID types.UserID) (UserMFAInfo, error) {
 	endpoint := fmt.Sprintf("https://%s/identity-authen-api/v1/domains/default/users/%s/mfa", as.AdminPortalAddress, userID)
 
-	client := getHTTPClient()
+	client := httpclient.GetHTTPClient()
 
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, endpoint, nil)
 	if err != nil {

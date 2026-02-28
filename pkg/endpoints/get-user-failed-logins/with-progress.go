@@ -1,9 +1,8 @@
-package blocks
+package get_user_failed_logins
 
 import (
 	"fmt"
 	"log/slog"
-	"msuite-toolkit/pkg/endpoints"
 	"msuite-toolkit/pkg/types"
 	"msuite-toolkit/pkg/utils"
 	"sync"
@@ -13,10 +12,10 @@ import (
 )
 
 // GetUsersFailedLoginsWithProgress fetches all failed logins for multiple users with an overall progress bar.
-func GetUsersFailedLoginsWithProgress(appState *types.AppState, users []endpoints.UserInfo) map[types.UserID][]endpoints.FailedLogin {
+func GetUsersFailedLoginsWithProgress(appState *types.AppState, users []types.UserInfo) map[types.UserID][]FailedLogin {
 	fmt.Println("Fetching users failed logins...")
 
-	userFailedLogins := make(map[types.UserID][]endpoints.FailedLogin)
+	userFailedLogins := make(map[types.UserID][]FailedLogin)
 	var mu sync.Mutex
 
 	// start progress printer
@@ -59,11 +58,11 @@ func GetUsersFailedLoginsWithProgress(appState *types.AppState, users []endpoint
 				}
 			}()
 
-			var allFailedLogins []endpoints.FailedLogin
+			var allFailedLogins []FailedLogin
 			limit := 200
 			offset := 0
 			for {
-				total, batch, err := endpoints.GetUserFailedLogins(appState, u.UserID, offset, limit)
+				total, batch, err := GetUserFailedLogins(appState, u.UserID, offset, limit)
 				if err != nil {
 					return fmt.Errorf("user %s: %w", u.UserID, err)
 				}

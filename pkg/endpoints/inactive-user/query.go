@@ -1,10 +1,11 @@
-package endpoints
+package inactive_user
 
 import (
 	"context"
 	"fmt"
 	"io"
 	"log/slog"
+	"msuite-toolkit/pkg/httpclient"
 	"msuite-toolkit/pkg/types"
 	"net/http"
 	"strings"
@@ -18,7 +19,7 @@ func InactiveUser(as *types.AppState, userID types.UserID) error {
 
 	payload := fmt.Sprintf(`{"value":"%s"}`, userID)
 
-	client := getHTTPClient()
+	client := httpclient.GetHTTPClient()
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodPut, endpoint, strings.NewReader(payload))
 	if err != nil {
 		slog.Error("creating request failed", "err", err)

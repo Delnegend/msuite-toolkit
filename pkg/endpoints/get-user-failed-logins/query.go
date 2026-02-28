@@ -1,4 +1,4 @@
-package endpoints
+package get_user_failed_logins
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"msuite-toolkit/pkg/httpclient"
 	"msuite-toolkit/pkg/types"
 	"net/http"
 	"net/url"
@@ -54,7 +55,7 @@ func GetUserFailedLogins(as *types.AppState, userID string, offset int, limit in
 	values.Set("request_payload", string(reqPayloadBytes))
 	reqURL := endpoint + "?" + values.Encode()
 
-	client := getHTTPClient()
+	client := httpclient.GetHTTPClient()
 
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, reqURL, nil)
 	if err != nil {

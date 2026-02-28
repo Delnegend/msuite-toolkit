@@ -1,16 +1,15 @@
-package blocks
+package get_users
 
 import (
 	"fmt"
 	"log/slog"
-	"msuite-toolkit/pkg/endpoints"
 	"msuite-toolkit/pkg/types"
 	"msuite-toolkit/pkg/utils"
 	"os"
 	"sync"
 )
 
-func GetUsersWithProgress(appState *types.AppState) []endpoints.UserInfo {
+func GetUsersWithProgress(appState *types.AppState) []types.UserInfo {
 	fmt.Println("Fetching users...")
 	var wg sync.WaitGroup
 	progressPercentChan := make(chan int)
@@ -19,7 +18,7 @@ func GetUsersWithProgress(appState *types.AppState) []endpoints.UserInfo {
 			utils.PrintProgressBar(percent)
 		}
 	})
-	users, err := endpoints.GetAllUsers(appState, progressPercentChan)
+	users, err := GetAllUsers(appState, progressPercentChan)
 	close(progressPercentChan)
 	wg.Wait()
 	if err != nil {
