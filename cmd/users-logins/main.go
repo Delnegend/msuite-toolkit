@@ -5,18 +5,20 @@ import (
 	"encoding/json"
 	"log/slog"
 	"msuite-toolkit/pkg/app"
-	"msuite-toolkit/pkg/blocks"
+	get_user_failed_logins "msuite-toolkit/pkg/endpoints/get-user-failed-logins"
+	get_user_mfa "msuite-toolkit/pkg/endpoints/get-user-mfa"
+	get_users "msuite-toolkit/pkg/endpoints/get-users"
 	"os"
 )
 
 func main() {
 	outputPath := app.Init("users_logins.csv")
 
-	users := blocks.GetUsersWithProgress(&app.AppState)
+	users := get_users.GetUsersWithProgress(&app.AppState)
 
-	userMFA := blocks.GetUsersMFAWithProgress(&app.AppState, users)
+	userMFA := get_user_mfa.GetUsersMFAWithProgress(&app.AppState, users)
 
-	userFailedLogins := blocks.GetUsersFailedLoginsWithProgress(&app.AppState, users)
+	userFailedLogins := get_user_failed_logins.GetUsersFailedLoginsWithProgress(&app.AppState, users)
 
 	// create CSV file
 	csvFile, err := os.Create(*outputPath)

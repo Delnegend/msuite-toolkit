@@ -4,16 +4,17 @@ import (
 	"encoding/csv"
 	"log/slog"
 	"msuite-toolkit/pkg/app"
-	"msuite-toolkit/pkg/blocks"
+	get_user_devices "msuite-toolkit/pkg/endpoints/get-user-devices"
+	get_users "msuite-toolkit/pkg/endpoints/get-users"
 	"os"
 )
 
 func main() {
 	outputPath := app.Init("user_devices.csv")
 
-	users := blocks.GetUsersWithProgress(&app.AppState)
+	users := get_users.GetUsersWithProgress(&app.AppState)
 
-	userDevices := blocks.GetUserDevicesWithProgress(&app.AppState, users)
+	userDevices := get_user_devices.GetUserDevicesWithProgress(&app.AppState, users)
 
 	// create CSV file
 	csvFile, err := os.Create(*outputPath)

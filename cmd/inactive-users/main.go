@@ -6,7 +6,7 @@ import (
 	"flag"
 	"log/slog"
 	"msuite-toolkit/pkg/app"
-	"msuite-toolkit/pkg/endpoints"
+	inactive_user "msuite-toolkit/pkg/endpoints/inactive-user"
 	"msuite-toolkit/pkg/types"
 	"os"
 	"strings"
@@ -46,7 +46,7 @@ func main() {
 			continue
 		}
 		total++
-		if err := endpoints.InactiveUser(&app.AppState, types.UserID(line)); err != nil {
+		if err := inactive_user.InactiveUser(&app.AppState, types.UserID(line)); err != nil {
 			msg := err.Error()
 			slog.Error("failed to inactive user", "user", line, "err", err)
 			failed++

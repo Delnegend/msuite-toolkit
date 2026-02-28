@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"log/slog"
 	"msuite-toolkit/pkg/app"
-	"msuite-toolkit/pkg/blocks"
-	"msuite-toolkit/pkg/endpoints"
+	get_user_device_last_ip "msuite-toolkit/pkg/endpoints/get-user-device-last-ip"
+	get_user_devices "msuite-toolkit/pkg/endpoints/get-user-devices"
+	get_user_mfa "msuite-toolkit/pkg/endpoints/get-user-mfa"
+	get_users "msuite-toolkit/pkg/endpoints/get-users"
 	"msuite-toolkit/pkg/types"
 	"os"
 )
@@ -14,13 +16,13 @@ import (
 func main() {
 	outputPath := app.Init("users_mfa_devices_ip.csv")
 
-	users := blocks.GetUsersWithProgress(&app.AppState)
+	users := get_users.GetUsersWithProgress(&app.AppState)
 
-	userMFA := blocks.GetUsersMFAWithProgress(&app.AppState, users)
+	userMFA := get_user_mfa.GetUsersMFAWithProgress(&app.AppState, users)
 
-	userDevices := blocks.GetUserDevicesWithProgress(&app.AppState, users)
+	userDevices := get_user_devices.GetUserDevicesWithProgress(&app.AppState, users)
 
-	usersDevicesLastIP := blocks.GetUsersDevicesLastIPWithProgress(&app.AppState, userDevices)
+	usersDevicesLastIP := get_user_device_last_ip.GetUsersDevicesLastIPWithProgress(&app.AppState, userDevices)
 
 	// create CSV file
 	csvFile, err := os.Create(*outputPath)
@@ -45,7 +47,7 @@ func main() {
 	}
 
 	type deviceWithIP struct {
-		endpoints.DeviceInfo
+		types.DeviceInfo
 		IP types.IPAddress `json:"ip"`
 	}
 
