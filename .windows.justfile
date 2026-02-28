@@ -11,5 +11,4 @@ build NAME:
 
 # Run a built CLI with a config file: run <name> <path-to-config>
 run NAME CONFIG:
-	if (!(Test-Path -Path "dist/{{NAME}}/{{NAME}}.exe")) { Write-Host "Executable dist/{{NAME}}/{{NAME}}.exe not found, run `just build {{NAME}}` first"; exit 1 }
-	./dist/{{NAME}}/{{NAME}}.exe -config {{CONFIG}}
+	go run ./cmd/{{NAME}} -config {{CONFIG}}

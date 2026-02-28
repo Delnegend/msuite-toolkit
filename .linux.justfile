@@ -11,5 +11,4 @@ build NAME:
 
 # Run a built CLI with a config file: run <name> <path-to-config>
 run NAME CONFIG:
-	if [ ! -f "dist/{{NAME}}/{{NAME}}" ]; then echo "Executable dist/{{NAME}}/{{NAME}} not found, run 'just build {{NAME}}' first"; exit 1; fi
-	./dist/{{NAME}}/{{NAME}} -config {{CONFIG}}
+	go run ./cmd/{{NAME}} -config {{CONFIG}}
