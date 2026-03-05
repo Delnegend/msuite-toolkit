@@ -12,3 +12,7 @@ build NAME:
 # Run a built CLI with a config file: run <name> <path-to-config>
 run NAME CONFIG:
 	go run ./cmd/{{NAME}} -config {{CONFIG}}
+
+# Run tests for a specific package: test <package-path>
+test PACKAGE:
+	go test -v "./pkg/{{PACKAGE}}"

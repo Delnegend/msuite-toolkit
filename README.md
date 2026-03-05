@@ -41,6 +41,12 @@ After copying the correct `.justfile` for your system, you can build and run usi
   just run NAME config.toml
   ```
 
+- **Run tests for a specific package:**
+  ```bash
+  just test PACKAGE
+  ```
+  (Where `PACKAGE` is a path within `pkg/`, like `endpoints/get-users`)
+
 ### Tool Flags
 Most tools support the following flags:
 - `-config`: Path to config file (default: `./config.toml`)
