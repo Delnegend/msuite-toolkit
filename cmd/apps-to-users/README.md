@@ -1,4 +1,9 @@
-# M-Suite Apps to Users Mapping Data Extraction CLI Usage
+stor# M-Suite Apps to Users Mapping Data Extraction CLI Usage
+
+## Description
+This tool extracts information about which users have access to which applications. It generates two CSV files:
+- `ONE-to-MANY`: A mapping of each application to a list of users who have access to it.
+- `ONE-to-ONE`: A direct mapping of each user to each application they have access to.
 
 ## Quick steps
 - Ensure M-Suite is open, turned on, and the Admin Portal app is present in the app list.

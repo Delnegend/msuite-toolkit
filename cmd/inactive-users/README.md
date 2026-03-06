@@ -1,5 +1,8 @@
 # M-Suite Batch Account Inactivate CLI Usage
 
+## Description
+This tool performs a batch inactivation of user accounts based on a provided list of User IDs. It processes each user and generates a CSV report indicating the success or failure of the inactivation for each account.
+
 ## Quick steps
 
 - Ensure M-Suite is open, turned on, and the Admin Portal app is present in the app list.

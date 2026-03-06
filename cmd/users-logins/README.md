@@ -1,5 +1,8 @@
 # M-Suite Users MFA & Logins Data Extraction CLI Usage
 
+## Description
+This tool extracts MFA status and a history of failed login attempts for each user. The output CSV includes User ID, Email, MFA configuration (JSON), and Failed Logins (JSON).
+
 ## Quick steps
 - Ensure M-Suite is open, turned on, and the Admin Portal app is present in the app list.
 - Fill `config.toml` (see instructions below).

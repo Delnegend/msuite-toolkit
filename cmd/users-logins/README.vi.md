@@ -1,5 +1,8 @@
 # Công cụ trích xuất dữ liệu MFA và nhật ký đăng nhập M-Suite
 
+## Mô tả
+Công cụ này trích xuất trạng thái MFA và lịch sử các lần đăng nhập thất bại của từng người dùng. File CSV đầu ra bao gồm User ID, Email, cấu hình MFA (JSON) và các lần đăng nhập thất bại (JSON).
+
 ## Các bước nhanh
 - Đảm bảo M-Suite đang mở, đã bật, và ứng dụng Admin Portal xuất hiện trong danh sách ứng dụng.
 - Điền `config.toml` theo hướng dẫn bên dưới.

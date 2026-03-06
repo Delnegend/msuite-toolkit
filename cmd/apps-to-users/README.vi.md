@@ -1,5 +1,10 @@
 # Công cụ trích xuất ánh xạ Ứng dụng và Người dùng M-Suite
 
+## Mô tả
+Công cụ này trích xuất thông tin về việc người dùng nào có quyền truy cập vào những ứng dụng nào. Công cụ tạo ra hai tệp CSV:
+- `ONE-to-MANY`: Ánh xạ mỗi ứng dụng tới danh sách người dùng có quyền truy cập.
+- `ONE-to-ONE`: Ánh xạ trực tiếp từng người dùng tới mỗi ứng dụng họ có quyền truy cập.
+
 ## Các bước nhanh
 - Đảm bảo M-Suite đang mở, đã bật, và ứng dụng Admin Portal xuất hiện trong danh sách ứng dụng.
 - Điền `config.toml` theo hướng dẫn bên dưới.

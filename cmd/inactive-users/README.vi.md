@@ -1,5 +1,8 @@
 # Công cụ khóa hàng loạt user M-Suite
 
+## Mô tả
+Công cụ này thực hiện khóa hàng loạt tài khoản người dùng dựa trên danh sách User ID được cung cấp. Nó xử lý từng người dùng và tạo báo cáo CSV cho biết trạng thái thành công hoặc thất bại của việc khóa đối với mỗi tài khoản.
+
 ## Các bước nhanh
 
 - Đảm bảo M-Suite đang mở, đã bật, và ứng dụng Admin Portal xuất hiện trong danh sách ứng dụng.
