@@ -41,7 +41,11 @@ func Init(defaultOutput string) *string {
 		os.Exit(1)
 	}
 
-	slog.Info("loaded config", "admin_portal", AppState.AdminPortalAddress, "admin_user_id", AppState.AdminUserID, "bearer_token_len", len(AppState.BearerToken))
+	if AppState.WorkerCount == 0 {
+		AppState.WorkerCount = 100
+	}
+
+	slog.Info("loaded config", "admin_portal", AppState.AdminPortalAddress, "admin_user_id", AppState.AdminUserID, "bearer_token_len", len(AppState.BearerToken), "worker_count", AppState.WorkerCount)
 
 	return outputPath
 }

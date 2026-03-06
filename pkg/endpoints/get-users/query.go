@@ -88,7 +88,7 @@ func GetUsers(as *types.AppState, offset int, limit int) (int, []types.UserInfo,
 
 // GetAllUsers fetches all users by making paginated requests.
 func GetAllUsers(as *types.AppState, progressPercentChan chan<- int) ([]types.UserInfo, error) {
-	pool := pond.NewPool(16)
+	pool := pond.NewPool(as.WorkerCount)
 
 	limit := 100
 

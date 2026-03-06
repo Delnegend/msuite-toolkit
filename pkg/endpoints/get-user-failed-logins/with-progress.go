@@ -28,7 +28,7 @@ func GetUsersFailedLoginsWithProgress(appState *types.AppState, users []types.Us
 		close(donePrinter)
 	}()
 
-	pool := pond.NewPool(100)
+	pool := pond.NewPool(appState.WorkerCount)
 
 	totalUsers := len(users)
 	if totalUsers == 0 {

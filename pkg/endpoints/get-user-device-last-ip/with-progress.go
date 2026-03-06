@@ -46,7 +46,7 @@ func GetUsersDevicesLastIPWithProgress(
 		return result
 	}
 
-	pool := pond.NewPool(100)
+	pool := pond.NewPool(appState.WorkerCount)
 
 	var completed int32
 	tasks := make([]pond.Task, 0, totalTasks)

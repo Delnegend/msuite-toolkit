@@ -26,6 +26,7 @@ Copy and edit `config.toml` with your environment values:
 - `bearer_token`: Open the Admin Portal in your browser, open Developer Tools -> Application -> Local Storage -> select the admin portal origin -> find the key `admin_portal_access_token` and copy its value.
 - `admin_user_id`: In the Admin Portal navigate to **Identity > Users, Groups & Unit > Users**, find the currently-logged-in admin user, click the result, then copy the **User ID** from Basic info.
 - `admin_portal_address`: Set to the Admin Portal host:port you are using (for example `10.0.0.1:9443`).
+- `worker_count`: The number of concurrent workers to use for API requests (default: `100`).
 
 ## Usage
 After copying the correct `.justfile` for your system, you can build and run using `just`:
