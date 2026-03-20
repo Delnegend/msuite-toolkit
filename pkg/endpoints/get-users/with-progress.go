@@ -9,7 +9,7 @@ import (
 	"sync"
 )
 
-func GetUsersWithProgress(appState *types.AppState) []types.UserInfo {
+func GetUsersWithProgress(appState *types.AppState, basePayload types.GetUsersRequestPayload) []types.UserInfo {
 	fmt.Println("Fetching users...")
 	var wg sync.WaitGroup
 	progressPercentChan := make(chan int)
@@ -18,7 +18,7 @@ func GetUsersWithProgress(appState *types.AppState) []types.UserInfo {
 			utils.PrintProgressBar(percent)
 		}
 	})
-	users, err := GetAllUsers(appState, progressPercentChan)
+	users, err := GetAllUsers(appState, basePayload, progressPercentChan)
 	close(progressPercentChan)
 	wg.Wait()
 	if err != nil {

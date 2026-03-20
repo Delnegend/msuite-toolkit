@@ -17,26 +17,16 @@ import (
 	"github.com/alitto/pond/v2"
 )
 
-// GetUsers fetches a batch of users starting from the given offset with the specified limit.
+// GetUsers fetches a batch of users using the provided request payload. Callers may
+// pass a payload with only the fields they want to change; missing fields will
+// receive reasonable defaults (offset=0, limit=100, orders by created_time asc, ...).
 // It returns the total count of users, the list of UserInfo, and any error encountered.
-func GetUsers(as *types.AppState, offset int, limit int) (int, []types.UserInfo, error) {
+func GetUsers(as *types.AppState, reqPayload types.GetUsersRequestPayload) (int, []types.UserInfo, error) {
 	endpoint := fmt.Sprintf("https://%s/identity-api/v1/domains/default/users", as.AdminPortalAddress)
-
-	reqPayloadBytes, err := json.Marshal(struct {
-		Offset      int            `json:"offset"`
-		Limit       int            `json:"limit"`
-		Orders      map[string]int `json:"orders"`
-		Search      string         `json:"search"`
-		Filters     []any          `json:"filters"`
-		ExtraParams map[string]any `json:"extra_params"`
-	}{
-		Offset:      offset,
-		Limit:       limit,
-		Orders:      map[string]int{"created_time": 1},
-		Search:      "",
-		Filters:     []any{},
-		ExtraParams: map[string]any{},
-	})
+	// The request payload is expected to be fully-initialized (use the builder
+	// `types.NewGetUsersRequestBuilder().Build()` to get defaults and override
+	// only desired fields). Marshal the provided payload directly.
+	reqPayloadBytes, err := json.Marshal(reqPayload)
 	if err != nil {
 		slog.Error("marshalling request payload failed", "err", err)
 		return 0, nil, fmt.Errorf("marshalling request payload failed: %w", err)
@@ -87,7 +77,7 @@ func GetUsers(as *types.AppState, offset int, limit int) (int, []types.UserInfo,
 }
 
 // GetAllUsers fetches all users by making paginated requests.
-func GetAllUsers(as *types.AppState, progressPercentChan chan<- int) ([]types.UserInfo, error) {
+func GetAllUsers(as *types.AppState, basePayload types.GetUsersRequestPayload, progressPercentChan chan<- int) ([]types.UserInfo, error) {
 	pool := pond.NewPool(as.WorkerCount)
 
 	limit := 100
@@ -100,8 +90,13 @@ func GetAllUsers(as *types.AppState, progressPercentChan chan<- int) ([]types.Us
 		}
 	}
 
-	// first request to get total count and first batch
-	total, firstBatch, err := GetUsers(as, 0, limit)
+	// first request to get total count and first batch (use limit=100 unless changed)
+	// build payload for first page by overriding offset/limit on basePayload
+	zero := 0
+	p := basePayload
+	p.Offset = &zero
+	p.Limit = &limit
+	total, firstBatch, err := GetUsers(as, p)
 	if err != nil {
 		slog.Error("initial fetch of users failed", "err", err)
 		return nil, err
@@ -146,7 +141,11 @@ func GetAllUsers(as *types.AppState, progressPercentChan chan<- int) ([]types.Us
 	for page := 1; page < pages; page++ {
 		offset := page * limit
 		task := pool.SubmitErr(func() error {
-			_, batch, err := GetUsers(as, offset, limit)
+			// build per-page payload from basePayload
+			pp := basePayload
+			pp.Offset = &offset
+			pp.Limit = &limit
+			_, batch, err := GetUsers(as, pp)
 			if err != nil {
 				slog.Error("fetching users failed", "err", err, "offset", offset)
 				atomic.AddInt32(&completed, 1)
