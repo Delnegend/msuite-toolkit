@@ -6,7 +6,12 @@ build NAME:
 	mkdir -p "dist/{{NAME}}"
 	go build -o "dist/{{NAME}}/{{NAME}}" "./cmd/{{NAME}}"
 	[ -f "cmd/{{NAME}}/README.md" ] && cp "cmd/{{NAME}}/README.md" "dist/{{NAME}}/README.md" || true
-	[ -f "config.toml" ] && cp "config.toml" "dist/{{NAME}}/config.toml" || true
+	# Prefer a command-specific config if present, otherwise fall back to repo root config.toml
+	if [ -f "cmd/{{NAME}}/config.toml" ]; then \
+		cp "cmd/{{NAME}}/config.toml" "dist/{{NAME}}/config.toml"; \
+	elif [ -f "config.toml" ]; then \
+		cp "config.toml" "dist/{{NAME}}/config.toml"; \
+	fi
 	echo "Built dist/{{NAME}}/{{NAME}} with documentation and config"
 
 # Run a built CLI with a config file and optional output file: run <name> <path-to-config> [output-file]
