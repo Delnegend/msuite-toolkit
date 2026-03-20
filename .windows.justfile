@@ -26,3 +26,6 @@ test PACKAGE:
 check:
 	go build ./cmd/...
 	Write-Host "OK: CLI packages compile"
+
+format:
+	go fmt ./...

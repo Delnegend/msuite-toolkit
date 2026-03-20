@@ -27,3 +27,6 @@ check:
 	@echo "Checking CLI compilation..."
 	go build ./cmd/...
 	@echo "OK: CLI packages compile"
+
+format:
+	go fmt ./...
