@@ -13,12 +13,12 @@ import (
 )
 
 type FailedLogin struct {
-	CreatedTime int64
-	IP          string
-	DeviceID    string
-	LoginName   string
-	LoginType   string
-	Reason      string
+	CreatedTime int64  `json:"created_time"`
+	IP          string `json:"ip"`
+	DeviceID    string `json:"device_id"`
+	LoginName   string `json:"login_name"`
+	LoginType   string `json:"login_type"`
+	Reason      string `json:"reason"`
 }
 
 // GetUserFailedLogins fetches a batch of failed logins for a specific user starting from the given offset with the specified limit.
