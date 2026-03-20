@@ -58,7 +58,7 @@ func GetUsersFailedLoginsWithProgress(appState *types.AppState, users []types.Us
 				}
 			}()
 
-			var allFailedLogins []FailedLogin
+			var allFailedLogins = make([]FailedLogin, 0)
 			limit := 200
 			offset := 0
 			for {
