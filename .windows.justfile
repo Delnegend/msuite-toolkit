@@ -16,3 +16,8 @@ run NAME CONFIG OUTPUT="":
 # Run tests for a specific package: test <package-path>
 test PACKAGE:
 	go test -v "./pkg/{{PACKAGE}}"
+
+# Check: compile all CLI packages under cmd/ to ensure they build
+check:
+	go build ./cmd/...
+	Write-Host "OK: CLI packages compile"
