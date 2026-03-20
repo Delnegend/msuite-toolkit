@@ -7,6 +7,7 @@ import (
 	"msuite-toolkit/pkg/app"
 	get_user_apps "msuite-toolkit/pkg/endpoints/get-user-apps"
 	get_users "msuite-toolkit/pkg/endpoints/get-users"
+	"msuite-toolkit/pkg/types"
 	"os"
 	"strings"
 )
@@ -14,7 +15,7 @@ import (
 func main() {
 	outputPath := app.Init("apps_to_users.csv")
 
-	users := get_users.GetUsersWithProgress(&app.AppState)
+	users := get_users.GetUsersWithProgress(&app.AppState, types.NewGetUsersRequestBuilder().Build())
 
 	appsMap := get_user_apps.GetUserAppsWithProgress(&app.AppState, users)
 

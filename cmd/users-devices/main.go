@@ -6,13 +6,14 @@ import (
 	"msuite-toolkit/pkg/app"
 	get_user_devices "msuite-toolkit/pkg/endpoints/get-user-devices"
 	get_users "msuite-toolkit/pkg/endpoints/get-users"
+	"msuite-toolkit/pkg/types"
 	"os"
 )
 
 func main() {
 	outputPath := app.Init("user_devices.csv")
 
-	users := get_users.GetUsersWithProgress(&app.AppState)
+	users := get_users.GetUsersWithProgress(&app.AppState, types.NewGetUsersRequestBuilder().Build())
 
 	userDevices := get_user_devices.GetUserDevicesWithProgress(&app.AppState, users)
 

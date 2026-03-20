@@ -8,13 +8,14 @@ import (
 	get_user_failed_logins "msuite-toolkit/pkg/endpoints/get-user-failed-logins"
 	get_user_mfa "msuite-toolkit/pkg/endpoints/get-user-mfa"
 	get_users "msuite-toolkit/pkg/endpoints/get-users"
+	"msuite-toolkit/pkg/types"
 	"os"
 )
 
 func main() {
 	outputPath := app.Init("users_logins.csv")
 
-	users := get_users.GetUsersWithProgress(&app.AppState)
+	users := get_users.GetUsersWithProgress(&app.AppState, types.NewGetUsersRequestBuilder().Build())
 
 	userMFA := get_user_mfa.GetUsersMFAWithProgress(&app.AppState, users)
 
