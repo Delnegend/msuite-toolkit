@@ -9,9 +9,9 @@ build NAME:
 	if (Test-Path -Path "config.toml") { Copy-Item "config.toml" "dist/{{NAME}}/config.toml" -Force }
 	Write-Host "Built dist/{{NAME}}/{{NAME}}.exe with documentation and config"
 
-# Run a built CLI with a config file: run <name> <path-to-config>
-run NAME CONFIG:
-	go run ./cmd/{{NAME}} -config {{CONFIG}}
+# Run a built CLI with a config file and optional output file: run <name> <path-to-config> [output-file]
+run NAME CONFIG OUTPUT="":
+	go run ./cmd/{{NAME}} -config {{CONFIG}} {{if OUTPUT == "" { "" } else { "-output " + OUTPUT }}}
 
 # Run tests for a specific package: test <package-path>
 test PACKAGE:
