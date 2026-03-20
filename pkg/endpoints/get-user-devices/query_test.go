@@ -11,7 +11,7 @@ func TestGetUserDevices(t *testing.T) {
 	const TEST_USER_ID = "6895fe2e5a62f6f14af9d954"
 
 	var appState types.AppState
-	if _, err := toml.DecodeFile("../../config.test.toml", &appState); err != nil {
+	if _, err := toml.DecodeFile("../../../config.test.toml", &appState); err != nil {
 		t.Fatalf("decoding config file failed: %v", err)
 	}
 
@@ -29,7 +29,7 @@ func TestGetUserDevices(t *testing.T) {
 
 func TestGetUserDevicesWithProgress(t *testing.T) {
 	var appState types.AppState
-	if _, err := toml.DecodeFile("../../config.test.toml", &appState); err != nil {
+	if _, err := toml.DecodeFile("../../../config.test.toml", &appState); err != nil {
 		t.Fatalf("decoding config file failed: %v", err)
 	}
 

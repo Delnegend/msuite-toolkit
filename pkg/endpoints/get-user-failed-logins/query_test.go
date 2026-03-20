@@ -11,7 +11,7 @@ func TestGetUserFailedLogins(t *testing.T) {
 	const TEST_USER_ID = "6895fe2e5a62f6f14af9d954"
 
 	var appState types.AppState
-	if _, err := toml.DecodeFile("../../config.test.toml", &appState); err != nil {
+	if _, err := toml.DecodeFile("../../../config.test.toml", &appState); err != nil {
 		t.Fatalf("decoding config file failed: %v", err)
 	}
 	t.Logf("Loaded config: admin_portal=%s, admin_user_id=%s, bearer_token_len=%d",
@@ -31,7 +31,7 @@ func TestGetUserFailedLogins(t *testing.T) {
 
 func TestGetUsersFailedLoginsWithProgress(t *testing.T) {
 	var appState types.AppState
-	if _, err := toml.DecodeFile("../../config.test.toml", &appState); err != nil {
+	if _, err := toml.DecodeFile("../../../config.test.toml", &appState); err != nil {
 		t.Fatalf("decoding config file failed: %v", err)
 	}
 

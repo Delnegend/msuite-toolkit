@@ -13,7 +13,8 @@ func TestGetUsers(t *testing.T) {
 		t.Fatalf("decoding config file failed: %v", err)
 	}
 
-	count, users, err := GetUsers(&appState, 0, 10)
+	// example: default call (nil payload)
+	count, users, err := GetUsers(&appState, 0, 10, nil)
 	if err != nil {
 		t.Fatalf("GetUsers failed: %v", err)
 	}
@@ -32,4 +33,25 @@ func TestGetUsersWithProgress(t *testing.T) {
 
 	users := GetUsersWithProgress(&appState)
 	t.Logf("Total users fetched with progress: %d", len(users))
+}
+
+func TestGetUsersWithCustomPayload(t *testing.T) {
+	var appState types.AppState
+	if _, err := toml.DecodeFile("../../config.test.toml", &appState); err != nil {
+		t.Fatalf("decoding config file failed: %v", err)
+	}
+
+	payload := &types.GetUsersRequestPayload{
+		Offset: 0,
+		Limit:  5,
+		Orders: map[string]int{"created_time": -1},
+		Search: "",
+	}
+
+	count, users, err := GetUsers(&appState, payload.Offset, payload.Limit, payload)
+	if err != nil {
+		t.Fatalf("GetUsers with custom payload failed: %v", err)
+	}
+
+	t.Logf("Custom payload fetch: returned %d users (total %d)", len(users), count)
 }
