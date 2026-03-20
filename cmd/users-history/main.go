@@ -85,7 +85,7 @@ func main() {
 		}
 
 		failedLoginsB := []byte("[]")
-		if failedLogins, ok := userFailedLogins[user.UserID]; ok {
+		if failedLogins, ok := userFailedLogins[user.UserID]; ok && failedLogins != nil {
 			var err error
 			failedLoginsB, err = json.Marshal(failedLogins)
 			if err != nil {
