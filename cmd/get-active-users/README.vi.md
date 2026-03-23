@@ -8,10 +8,10 @@ Lọc "active":
 - `organizational_unit_id`: tùy chọn giới hạn kết quả theo một OU cụ thể (để trống để bỏ qua)
 
 ## Các bước nhanh
-- `cmd/active-users/config.tom` đã có trong repo và sẽ được sử dụng mặc định.
+- `cmd/get-active-users/config.tom` đã có trong repo và sẽ được sử dụng mặc định.
 - Chạy công cụ từ thư mục này:
 ```
-./active-users.exe
+./get-active-users.exe
 ```
 
 ## Tham số
@@ -27,10 +27,11 @@ Lọc "active":
 - `organizational_unit_id`: ID OU nếu muốn lọc theo OU (để trống nếu không dùng).
 
 ## Ví dụ
-Repo đã chứa `cmd/active-users/config.tom`. `just build` sẽ đóng gói cấu hình
-riêng cho lệnh này vào `dist/`; nếu không có, `config.toml` gốc của repo sẽ được dùng.
+Repo đã chứa `cmd/get-active-users/config.tom`. `just build` sẽ đóng gói cấu hình
+riêng cho lệnh này vào `dist/`; nếu không có, `config.toml` gốc của repo sẽ được
+ dùng.
 Để chạy cục bộ:
 
 ```
-go run ./cmd/active-users -config ./cmd/active-users/config.toml -output actives.json
+go run ./cmd/get-active-users -config ./cmd/get-active-users/config.toml -output actives.json
 ```

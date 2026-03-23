@@ -8,7 +8,7 @@ Công cụ này trích xuất danh sách tất cả các thiết bị liên kế
 - Điền `config.toml` theo hướng dẫn bên dưới.
 - Mở terminal trong thư mục này (nhấp chuột phải vào thư mục này và chọn "Open in Terminal") và chạy:
 ```
-./users-devices.exe
+./get-user-devices.exe
 ```
 
 ## Tham số
@@ -18,16 +18,9 @@ Công cụ này trích xuất danh sách tất cả các thiết bị liên kế
 
 ## Cách điền `config.toml`
 - `bearer_token`: mở Admin Portal trong trình duyệt, DevTools -> Application (hoặc Storage) -> Local Storage -> chọn origin của Admin Portal -> tìm khóa `admin_portal_access_token` và sao chép giá trị.
-- `admin_user_id`: trong Admin Portal vào Identity > Users, Groups & Unit > Users, tìm user admin đang đăng nhập, click vào kết quả, sao chép `User ID` trong Basic info.
-- `admin_portal_address`: thay bằng địa chỉ Admin Portal hiện tại (host:port), ví dụ `10.0.0.1:9443`.
+- `admin_user_id`: trong Admin Portal vào Identity > Users, Groups & Unit > Users, tìm admin đang đăng nhập và sao chép `User ID` từ Basic info.
+- `admin_portal_address`: địa chỉ Admin Portal (ví dụ `10.0.0.1:9443`).
 
 ## Ghi chú khi chạy
-- Sau khi điền `config.toml`, chạy `./users-devices.exe`. File đầu ra mặc định sẽ xuất hiện cùng thư mục với công cụ.
+- Sau khi điền `config.toml`, chạy `./get-user-devices.exe`. File đầu ra mặc định sẽ xuất hiện cùng thư mục với công cụ.
 - File đầu ra CSV phân tách bằng dấu `|` và bao gồm các cột sau: `UserID`, `UserEmail`, `DeviceID`, `DeviceName`, `DeviceType`, `LastUsed`.
-- Dùng `-c` để chỉ file config khác và `-o` để đặt tên file đầu ra khác.
-
-## Ví dụ đầu ra
-```
-UserID|UserEmail|DeviceID|DeviceName|DeviceType|LastUsed
-12345|user@example.com|dev-1|iPhone 13|iPhone|2023-10-01 10:00:00
-```

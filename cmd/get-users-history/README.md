@@ -12,7 +12,7 @@ This tool extracts a comprehensive history for each user, including:
 - Fill `config.toml` (see instructions below).
 - Open a terminal in this directory (right-click this folder and select "Open in Terminal") and run the tool:
 ```
-./users-history.exe
+./get-users-history.exe
 ```
 
 ## Flags
@@ -26,13 +26,6 @@ This tool extracts a comprehensive history for each user, including:
 - `admin_portal_address`: set to the Admin Portal host:port you are using (for example `10.0.0.1:9443`).
 
 ## Run notes
-- After filling `config.toml`, run `./users-mfa-devices-ip.exe`. The default output file will be created next to the tool.
+- After filling `config.toml`, run `./get-users-history.exe`. The default output file will be created next to the tool.
 - The output CSV is pipe-separated and includes the following columns: `UserID`, `UserEmail`, `MFA`, `Device`.
 - Columns `MFA` and `Device` contain JSON data for multi-factor authentication methods and device details (including the last recorded IP address).
-- Use `-c` to point to a different config file and `-o` to choose another output file name.
-
-## Example output
-```
-UserID|UserEmail|MFA|Device
-12345|user@example.com|{"type": "totp", "enabled": true}|[{"id": "dev-1", "name": "iPhone 13", "ip": "1.2.3.4"}]
-```

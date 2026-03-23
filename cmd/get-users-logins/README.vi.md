@@ -1,23 +1,19 @@
-# Công cụ trích xuất Lịch sử Người dùng M-Suite
+# Công cụ trích xuất dữ liệu MFA và nhật ký đăng nhập M-Suite
 
 ## Mô tả
-Công cụ này trích xuất lịch sử toàn diện cho từng người dùng, bao gồm:
-- Trạng thái và cấu hình MFA.
-- Danh sách tất cả các thiết bị liên kết với người dùng.
-- Địa chỉ IP cuối cùng được biết cho mỗi thiết bị.
-- Lịch sử các lần đăng nhập thất bại.
+Công cụ này trích xuất trạng thái MFA và lịch sử các lần đăng nhập thất bại của từng người dùng. File CSV đầu ra bao gồm User ID, Email, cấu hình MFA (JSON) và các lần đăng nhập thất bại (JSON).
 
 ## Các bước nhanh
 - Đảm bảo M-Suite đang mở, đã bật, và ứng dụng Admin Portal xuất hiện trong danh sách ứng dụng.
 - Điền `config.toml` theo hướng dẫn bên dưới.
 - Mở terminal trong thư mục này (nhấp chuột phải vào thư mục này và chọn "Open in Terminal") và chạy:
 ```
-./users-history.exe
+./get-users-logins.exe
 ```
 
 ## Tham số
 - `-config`: đường dẫn tới file config (mặc định: `./config.toml`)
-- `-output`: đường dẫn file CSV đầu ra (mặc định: `users_history.csv`)
+- `-output`: đường dẫn file CSV đầu ra (mặc định: `users_logins.csv`)
 - `-h` hoặc `-help`: hiển thị trợ giúp
 
 ## Cách điền `config.toml`
@@ -26,13 +22,11 @@ Công cụ này trích xuất lịch sử toàn diện cho từng người dùng
 - `admin_portal_address`: thay bằng địa chỉ Admin Portal hiện tại (host:port), ví dụ `10.0.0.1:9443`.
 
 ## Ghi chú khi chạy
-- Sau khi điền `config.toml`, chạy `./users-mfa-devices-ip.exe`. File đầu ra mặc định sẽ xuất hiện cùng thư mục với công cụ.
-- File đầu ra CSV phân tách bằng dấu `|` và bao gồm các cột sau: `UserID`, `UserEmail`, `MFA`, `Device`.
-- Các cột `MFA` và `Device` chứa dữ liệu dạng JSON cho các phương thức xác thực đa yếu tố và thông tin thiết bị (bao gồm cả địa chỉ IP cuối cùng được ghi nhận).
+- Sau khi điền `config.toml`, chạy `./get-users-logins.exe`. File đầu ra mặc định sẽ xuất hiện cùng thư mục với công cụ.
 - Dùng `-c` để chỉ file config khác và `-o` để đặt tên file đầu ra khác.
 
 ## Ví dụ đầu ra
 ```
-UserID|UserEmail|MFA|Device
-12345|user@example.com|{"type": "totp", "enabled": true}|[{"id": "dev-1", "name": "iPhone 13", "ip": "1.2.3.4"}]
+User ID|Email|MFA|Failed logins
+12345|user@example.com|{"type": "totp", "enabled": true}|[{"timestamp": "2023-10-01T10:00:00Z", "ip": "1.2.3.4"}]
 ```

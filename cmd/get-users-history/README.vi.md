@@ -1,19 +1,23 @@
-# Công cụ trích xuất dữ liệu MFA và nhật ký đăng nhập M-Suite
+# Công cụ trích xuất Lịch sử Người dùng M-Suite
 
 ## Mô tả
-Công cụ này trích xuất trạng thái MFA và lịch sử các lần đăng nhập thất bại của từng người dùng. File CSV đầu ra bao gồm User ID, Email, cấu hình MFA (JSON) và các lần đăng nhập thất bại (JSON).
+Công cụ này trích xuất lịch sử toàn diện cho từng người dùng, bao gồm:
+- Trạng thái và cấu hình MFA.
+- Danh sách tất cả các thiết bị liên kết với người dùng.
+- Địa chỉ IP cuối cùng được biết cho mỗi thiết bị.
+- Lịch sử các lần đăng nhập thất bại.
 
 ## Các bước nhanh
 - Đảm bảo M-Suite đang mở, đã bật, và ứng dụng Admin Portal xuất hiện trong danh sách ứng dụng.
 - Điền `config.toml` theo hướng dẫn bên dưới.
 - Mở terminal trong thư mục này (nhấp chuột phải vào thư mục này và chọn "Open in Terminal") và chạy:
 ```
-./users-logins.exe
+./get-users-history.exe
 ```
 
 ## Tham số
 - `-config`: đường dẫn tới file config (mặc định: `./config.toml`)
-- `-output`: đường dẫn file CSV đầu ra (mặc định: `users_logins.csv`)
+- `-output`: đường dẫn file CSV đầu ra (mặc định: `users_history.csv`)
 - `-h` hoặc `-help`: hiển thị trợ giúp
 
 ## Cách điền `config.toml`
@@ -22,11 +26,5 @@ Công cụ này trích xuất trạng thái MFA và lịch sử các lần đăn
 - `admin_portal_address`: thay bằng địa chỉ Admin Portal hiện tại (host:port), ví dụ `10.0.0.1:9443`.
 
 ## Ghi chú khi chạy
-- Sau khi điền `config.toml`, chạy `./users-logins.exe`. File đầu ra mặc định sẽ xuất hiện cùng thư mục với công cụ.
-- Dùng `-c` để chỉ file config khác và `-o` để đặt tên file đầu ra khác.
-
-## Ví dụ đầu ra
-```
-User ID|Email|MFA|Failed logins
-12345|user@example.com|{"type": "totp", "enabled": true}|[{"timestamp": "2023-10-01T10:00:00Z", "ip": "1.2.3.4"}]
-```
+- Sau khi điền `config.toml`, chạy `./get-users-history.exe`. File đầu ra mặc định sẽ xuất hiện cùng thư mục với công cụ.
+- File đầu ra CSV phân tách bằng dấu `|` và bao gồm các cột sau: `UserID`, `UserEmail`, `MFA`, `Device`.

@@ -8,7 +8,7 @@ This tool extracts a list of all devices associated with each user in the system
 - Fill `config.toml` (see instructions below).
 - Open a terminal in this directory (right-click this folder and select "Open in Terminal") and run the tool:
 ```
-./users-devices.exe
+./get-user-devices.exe
 ```
 
 ## Flags
@@ -22,12 +22,6 @@ This tool extracts a list of all devices associated with each user in the system
 - `admin_portal_address`: set to the Admin Portal host:port you are using (for example `10.0.0.1:9443`).
 
 ## Run notes
-- After filling `config.toml`, run `./users-devices.exe`. The default output file will be created next to the tool.
+- After filling `config.toml`, run `./get-user-devices.exe`. The default output file will be created next to the tool.
 - The output CSV is pipe-separated and includes the following columns: `UserID`, `UserEmail`, `DeviceID`, `DeviceName`, `DeviceType`, `LastUsed`.
-- Use `-c` to point to a different config file and `-o` to choose another output file name.
 
-## Example output
-```
-UserID|UserEmail|DeviceID|DeviceName|DeviceType|LastUsed
-12345|user@example.com|dev-1|iPhone 13|iPhone|2023-10-01 10:00:00
-```

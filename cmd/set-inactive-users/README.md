@@ -14,10 +14,10 @@ This tool performs a batch inactivation of user accounts based on a provided lis
 67890
 ```
 
-- Open a terminal in this directory (right-click this folder and select "Open in Terminal") and run the tool:
+- Open a terminal in this directory and run the tool:
 
 ```
-./inactive-users.exe -input users.txt
+./set-inactive-users.exe -input users.txt
 ```
 
 ## Flags
@@ -35,16 +35,9 @@ This tool performs a batch inactivation of user accounts based on a provided lis
 
 ## Run notes
 
-- After filling `config.toml`, run `./inactive-users.exe -input users.txt`. The tool will call the Admin Portal to lock each user listed in `users.txt` and write results to the output CSV (see `-output`).
+- After filling `config.toml`, run `./set-inactive-users.exe -input users.txt`. The tool will call the Admin Portal to lock each user listed in `users.txt` and write results to the output CSV (see `-output`).
 - The output CSV contains rows like:
 
-```
-UserID|Result
-12345|OK
-67890|request failed: unexpected status code: 500
-```
-
-## Example output
 ```
 UserID|Result
 12345|OK

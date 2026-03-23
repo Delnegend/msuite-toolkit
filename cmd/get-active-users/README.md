@@ -8,10 +8,10 @@ Active filtering options (configured in `config.toml`):
 - `organizational_unit_id`: optional OU id to restrict results to a specific organizational unit (empty = ignored)
 
 ## Quick steps
-- `cmd/active-users/config.tom` is included in this repo and will be used by default.
+- `cmd/get-active-users/config.tom` is included in this repo and will be used by default.
 - Run the tool from this directory:
 ```
-./active-users.exe
+./get-active-users.exe
 ```
 
 ## Flags
@@ -27,10 +27,10 @@ Active filtering options (configured in `config.toml`):
 - `organizational_unit_id`: OU id to filter users (leave blank to ignore).
 
 ## Example
-The repository includes `cmd/active-users/config.tom`. `just build` will bundle this
+The repository includes `cmd/get-active-users/config.tom`. `just build` will bundle this
 command-specific config into the `dist/` artifact; otherwise the root `config.toml`
 is used. To run locally:
 
 ```
-go run ./cmd/active-users -config ./cmd/active-users/config.toml -output actives.json
+go run ./cmd/get-active-users -config ./cmd/get-active-users/config.toml -output actives.json
 ```
