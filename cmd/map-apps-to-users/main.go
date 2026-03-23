@@ -41,8 +41,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	for appName, users := range appsMap {
-		if err := w.Write([]string{appName, strings.Join(users, ",")}); err != nil {
+	for app, users := range appsMap {
+		if err := w.Write(
+			[]string{
+				fmt.Sprintf("%s (%d)", app.App.Name, app.App.AppID),
+				strings.Join(users, ","),
+			}); err != nil {
 			slog.Error("writing csv row failed", "err", err)
 			os.Exit(1)
 		}
@@ -75,9 +79,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	for appName, users := range appsMap {
+	for app, users := range appsMap {
 		for _, user := range users {
-			if err := w2.Write([]string{appName, user}); err != nil {
+			if err := w2.Write(
+				[]string{
+					fmt.Sprintf("%s (%d)",
+						app.App.Name, app.App.AppID),
+					user,
+				}); err != nil {
 				slog.Error("writing csv row failed", "err", err)
 				os.Exit(1)
 			}

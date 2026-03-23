@@ -14,10 +14,10 @@ import (
 // GetUserAppsWithProgress fetches authorized apps for each user and returns
 // a map keyed by formatted app string "<name> (<id>)" to the slice of user IDs
 // who have that app.
-func GetUserAppsWithProgress(appState *types.AppState, users []types.UserInfo) map[string][]types.UserEmail {
+func GetUserAppsWithProgress(appState *types.AppState, users []types.UserInfo) map[*AuthorizedApp][]types.UserEmail {
 	fmt.Println("Fetching user apps...")
 
-	appsMap := make(map[string][]types.UserEmail)
+	appsMap := make(map[*AuthorizedApp][]types.UserEmail)
 	var mu sync.Mutex
 
 	// progress printer
@@ -67,9 +67,8 @@ func GetUserAppsWithProgress(appState *types.AppState, users []types.UserInfo) m
 			}
 
 			mu.Lock()
-			for _, a := range apps {
-				key := fmt.Sprintf("%s (%d)", a.Name, a.AppID)
-				appsMap[key] = append(appsMap[key], u.UserEmail)
+			for _, di := range apps {
+				appsMap[&di] = append(appsMap[&di], u.UserEmail)
 			}
 			mu.Unlock()
 			return nil
