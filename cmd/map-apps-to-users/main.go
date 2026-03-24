@@ -27,9 +27,9 @@ func main() {
 
 	appsMap := get_user_apps.GetUserAppsWithProgress(as, users)
 
-	// ONE to MANY
+	// ONE APP to MANY USERS
 
-	csvFile, err := os.Create(fmt.Sprintf("ONE-to-MANY_%s", *outputPath))
+	csvFile, err := os.Create(fmt.Sprintf("ONE_APP-to-MANY_USERS_%s", *outputPath))
 	if err != nil {
 		slog.Error("creating csv file failed", "err", err)
 		os.Exit(1)
@@ -65,9 +65,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	// ONE to ONE
+	// ONE APP to ONE USER
 
-	csvFile2, err := os.Create(fmt.Sprintf("ONE-to-ONE_%s", *outputPath))
+	csvFile2, err := os.Create(fmt.Sprintf("ONE_APP-to-ONE_USER_%s", *outputPath))
 	if err != nil {
 		slog.Error("creating csv file failed", "err", err)
 		os.Exit(1)
@@ -102,6 +102,51 @@ func main() {
 	}
 
 	if err := w2.Error(); err != nil {
+		slog.Error("csv writer encountered error", "err", err)
+		os.Exit(1)
+	}
+
+	// ONE USER to MANY APPS
+
+	csvFile3, err := os.Create(fmt.Sprintf("ONE_USER-to-MANY_APPS_%s", *outputPath))
+	if err != nil {
+		slog.Error("creating csv file failed", "err", err)
+		os.Exit(1)
+	}
+	defer func() {
+		if err := csvFile3.Close(); err != nil {
+			slog.Error("closing csv file failed", "err", err)
+		}
+	}()
+
+	w3 := csv.NewWriter(csvFile3)
+	w3.Comma = '|'
+	defer w3.Flush()
+
+	if err := w3.Write([]string{"User", "Apps"}); err != nil {
+		slog.Error("writing csv header failed", "err", err)
+		os.Exit(1)
+	}
+
+	userToAppsMap := make(map[types.UserEmail][]string)
+	for app, users := range appsMap {
+		for _, user := range users {
+			userToAppsMap[user] = append(userToAppsMap[user], fmt.Sprintf("%s (%d)", app.App.Name, app.App.AppID))
+		}
+	}
+
+	for user, apps := range userToAppsMap {
+		if err := w3.Write(
+			[]string{
+				user,
+				strings.Join(apps, ","),
+			}); err != nil {
+			slog.Error("writing csv row failed", "err", err)
+			os.Exit(1)
+		}
+	}
+
+	if err := w3.Error(); err != nil {
 		slog.Error("csv writer encountered error", "err", err)
 		os.Exit(1)
 	}
