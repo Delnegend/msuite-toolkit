@@ -52,6 +52,23 @@ func (b *GetUsersRequestPayloadBuilder) WithFilters(f []any) *GetUsersRequestPay
 	return b
 }
 
+func (b *GetUsersRequestPayloadBuilder) WithFilterByOrgUnitID(ouID string) *GetUsersRequestPayloadBuilder {
+	if ouID == "" {
+		return b
+	}
+	filter := map[string]any{
+		"key":      "IdentityOwnerInfo.OrganizationUnitInfos.OrganizationUnitId",
+		"operator": "equal_to",
+		"value":    ouID,
+		"origin": map[string]any{
+			"key":      "organization_unit_id",
+			"operator": "custom",
+			"value":    ouID,
+		},
+	}
+	return b.WithFilters([]any{filter})
+}
+
 func (b *GetUsersRequestPayloadBuilder) WithExtraParams(p map[string]any) *GetUsersRequestPayloadBuilder {
 	b.extraParamsSet = true
 	b.extraParams = p

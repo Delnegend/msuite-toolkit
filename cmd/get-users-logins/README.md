@@ -20,3 +20,4 @@ This tool extracts MFA status and a history of failed login attempts for each us
 - `bearer_token`: open the Admin Portal in your browser, open Developer Tools -> Application (or Storage) -> Local Storage -> select the admin portal origin -> find the key `admin_portal_access_token` and copy its value.
 - `admin_user_id`: in the Admin Portal navigate to Identity > Users, Groups & Unit > Users, find the currently-logged-in admin user, click the result, then copy the `User ID` from Basic info.
 - `admin_portal_address`: set to the Admin Portal host:port you are using (for example `10.0.0.1:9443`).
+- `organizational_unit_id`: optional OU id to restrict user results to a specific organizational unit (leave blank to ignore).

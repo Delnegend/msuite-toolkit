@@ -31,7 +31,13 @@ func TestGetUsersWithProgress(t *testing.T) {
 		t.Fatalf("decoding config file failed: %v", err)
 	}
 
-	users := GetUsersWithProgress(&appState, types.NewGetUsersRequestBuilder().Build())
+	users := GetUsersWithProgress(
+		&appState,
+		types.
+			NewGetUsersRequestBuilder().
+			WithFilterByOrgUnitID(appState.OrganizationalUnitID).
+			Build(),
+	)
 	t.Logf("Total users fetched with progress: %d", len(users))
 }
 

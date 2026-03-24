@@ -17,7 +17,14 @@ import (
 func main() {
 	outputPath := app.Init("users_history.csv")
 
-	users := get_users.GetUsersWithProgress(&app.AppState, types.NewGetUsersRequestBuilder().Build())
+	as := &app.AppState
+
+	users := get_users.GetUsersWithProgress(
+		as,
+		types.
+			NewGetUsersRequestBuilder().
+			WithFilterByOrgUnitID(as.OrganizationalUnitID).Build(),
+	)
 
 	userMFA := get_user_mfa.GetUsersMFAWithProgress(&app.AppState, users)
 

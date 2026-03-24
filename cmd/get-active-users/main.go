@@ -16,26 +16,14 @@ func main() {
 
 	as := &app.AppState
 
-	// Build base payload: include OU filter server-side if configured
-	builder := types.NewGetUsersRequestBuilder()
-	if as.OrganizationalUnitID != "" {
-		ou := as.OrganizationalUnitID
-		filter := map[string]any{
-			"key":      "IdentityOwnerInfo.OrganizationUnitInfos.OrganizationUnitId",
-			"operator": "equal_to",
-			"value":    ou,
-			"origin": map[string]any{
-				"key":      "organization_unit_id",
-				"operator": "custom",
-				"value":    ou,
-			},
-		}
-		builder = builder.WithFilters([]any{filter})
-	}
-
-	basePayload := builder.Build()
-
-	users, err := get_users.GetAllUsers(as, basePayload, nil)
+	users, err := get_users.GetAllUsers(
+		as,
+		types.
+			NewGetUsersRequestBuilder().
+			WithFilterByOrgUnitID(as.OrganizationalUnitID).
+			Build(),
+		nil,
+	)
 	if err != nil {
 		slog.Error("fetching users failed", "err", err)
 		os.Exit(1)

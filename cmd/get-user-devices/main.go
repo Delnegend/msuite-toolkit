@@ -13,9 +13,16 @@ import (
 func main() {
 	outputPath := app.Init("user_devices.csv")
 
-	users := get_users.GetUsersWithProgress(&app.AppState, types.NewGetUsersRequestBuilder().Build())
+	as := &app.AppState
 
-	userDevices := get_user_devices.GetUserDevicesWithProgress(&app.AppState, users)
+	users := get_users.GetUsersWithProgress(
+		as,
+		types.NewGetUsersRequestBuilder().
+			WithFilterByOrgUnitID(as.OrganizationalUnitID).
+			Build(),
+	)
+
+	userDevices := get_user_devices.GetUserDevicesWithProgress(as, users)
 
 	// create CSV file
 	csvFile, err := os.Create(*outputPath)

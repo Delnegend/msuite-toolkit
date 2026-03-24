@@ -20,6 +20,7 @@ Công cụ này trích xuất trạng thái MFA và lịch sử các lần đăn
 - `bearer_token`: mở Admin Portal trong trình duyệt, DevTools -> Application (hoặc Storage) -> Local Storage -> chọn origin của Admin Portal -> tìm khóa `admin_portal_access_token` và sao chép giá trị.
 - `admin_user_id`: trong Admin Portal vào Identity > Users, Groups & Unit > Users, tìm user admin đang đăng nhập, click vào kết quả, sao chép `User ID` trong Basic info.
 - `admin_portal_address`: thay bằng địa chỉ Admin Portal hiện tại (host:port), ví dụ `10.0.0.1:9443`.
+- `organizational_unit_id`: tùy chọn ID OU để giới hạn kết quả người dùng theo một đơn vị tổ chức cụ thể (để trống để bỏ qua).
 
 ## Ghi chú khi chạy
 - Sau khi điền `config.toml`, chạy `./get-users-logins.exe`. File đầu ra mặc định sẽ xuất hiện cùng thư mục với công cụ.

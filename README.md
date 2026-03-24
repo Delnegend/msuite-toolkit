@@ -27,6 +27,7 @@ Copy and edit `config.toml` with your environment values:
 - `admin_user_id`: In the Admin Portal navigate to **Identity > Users, Groups & Unit > Users**, find the currently-logged-in admin user, click the result, then copy the **User ID** from Basic info.
 - `admin_portal_address`: Set to the Admin Portal host:port you are using (for example `10.0.0.1:9443`).
 - `worker_count`: The number of concurrent workers to use for API requests (default: `100`).
+- `organizational_unit_id`: Optional organizational unit ID to restrict user-related queries to a specific OU (empty = no OU filtering).
 
 ## Usage
 After copying the correct `.justfile` for your system, you can build and run using `just`:

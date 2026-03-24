@@ -15,7 +15,15 @@ import (
 func main() {
 	outputPath := app.Init("apps_to_users.csv")
 
-	users := get_users.GetUsersWithProgress(&app.AppState, types.NewGetUsersRequestBuilder().Build())
+	as := &app.AppState
+
+	users := get_users.GetUsersWithProgress(
+		as,
+		types.
+			NewGetUsersRequestBuilder().
+			WithFilterByOrgUnitID(as.OrganizationalUnitID).
+			Build(),
+	)
 
 	appsMap := get_user_apps.GetUserAppsWithProgress(&app.AppState, users)
 
