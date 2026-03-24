@@ -25,7 +25,7 @@ func main() {
 			Build(),
 	)
 
-	appsMap := get_user_apps.GetUserAppsWithProgress(&app.AppState, users)
+	appsMap := get_user_apps.GetUserAppsWithProgress(as, users)
 
 	// ONE to MANY
 

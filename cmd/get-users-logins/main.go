@@ -25,9 +25,9 @@ func main() {
 			Build(),
 	)
 
-	userMFA := get_user_mfa.GetUsersMFAWithProgress(&app.AppState, users)
+	userMFA := get_user_mfa.GetUsersMFAWithProgress(as, users)
 
-	userFailedLogins := get_user_failed_logins.GetUsersFailedLoginsWithProgress(&app.AppState, users)
+	userFailedLogins := get_user_failed_logins.GetUsersFailedLoginsWithProgress(as, users)
 
 	// create CSV file
 	csvFile, err := os.Create(*outputPath)

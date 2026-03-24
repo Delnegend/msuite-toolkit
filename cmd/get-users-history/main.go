@@ -26,13 +26,13 @@ func main() {
 			WithFilterByOrgUnitID(as.OrganizationalUnitID).Build(),
 	)
 
-	userMFA := get_user_mfa.GetUsersMFAWithProgress(&app.AppState, users)
+	userMFA := get_user_mfa.GetUsersMFAWithProgress(as, users)
 
-	userDevices := get_user_devices.GetUserDevicesWithProgress(&app.AppState, users)
+	userDevices := get_user_devices.GetUserDevicesWithProgress(as, users)
 
-	usersDevicesLastIP := get_user_device_last_ip.GetUsersDevicesLastIPWithProgress(&app.AppState, userDevices)
+	usersDevicesLastIP := get_user_device_last_ip.GetUsersDevicesLastIPWithProgress(as, userDevices)
 
-	userFailedLogins := get_user_failed_logins.GetUsersFailedLoginsWithProgress(&app.AppState, users)
+	userFailedLogins := get_user_failed_logins.GetUsersFailedLoginsWithProgress(as, users)
 
 	// create CSV file
 	csvFile, err := os.Create(*outputPath)

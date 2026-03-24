@@ -13,7 +13,9 @@ import (
 func main() {
 	outputPath := app.Init("provision_policies.csv")
 
-	policies, err := get_provision_policies.GetProvisionPoliciesWithProgress(&app.AppState)
+	as := &app.AppState
+
+	policies, err := get_provision_policies.GetProvisionPoliciesWithProgress(as)
 	if err != nil {
 		slog.Error("fetching provision policies failed", "err", err)
 		os.Exit(1)
