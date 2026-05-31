@@ -22,7 +22,7 @@ func main() {
 	users := get_users.GetUsersWithProgress(
 		as,
 		types.
-			NewGetUsersRequestBuilder().
+			NewQueryRequestBuilder().
 			WithFilterByOrgUnitID(as.OrganizationalUnitID).Build(),
 	)
 
