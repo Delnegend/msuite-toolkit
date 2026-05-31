@@ -17,7 +17,7 @@ func main() {
 
 	users := get_users.GetUsersWithProgress(
 		as,
-		types.NewGetUsersRequestBuilder().
+		types.NewQueryRequestBuilder().
 			WithFilterByOrgUnitID(as.OrganizationalUnitID).
 			Build(),
 	)
@@ -58,7 +58,7 @@ func main() {
 				user.UserEmail,
 				device.DeviceID,
 				device.DeviceName,
-				device.ProductName,
+				device.MetaData.ProductName,
 				device.UpdatedTimeString(),
 			}); err != nil {
 				slog.Error("writing csv row failed", "err", err)
