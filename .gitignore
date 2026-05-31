@@ -30,3 +30,4 @@ config.*.toml
 *.csv
 dist/
 .justfile
+.vscode/
