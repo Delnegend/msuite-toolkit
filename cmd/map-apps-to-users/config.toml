@@ -1,0 +1,6 @@
+bearer_token = "CHANGE_ME"
+admin_user_id = "CHANGE_ME"
+admin_portal_address = "10.0.0.1:9443"
+worker_count = 16
+organizational_unit_id = "64620f8bd9c393f77c1ac691"
+filter_by = { destination_host = "", destination_port = "3389" }
