@@ -27,6 +27,11 @@ This tool extracts a comprehensive history for each user, including:
 - `organizational_unit_id`: optional OU id to restrict user results to a specific organizational unit (leave blank to ignore).
 
 ## Run notes
-- After filling `config.toml`, run `./get-users-history.exe`. The default output file will be created next to the tool.
-- The output CSV is pipe-separated and includes the following columns: `UserID`, `UserEmail`, `MFA`, `Device`.
-- Columns `MFA` and `Device` contain JSON data for multi-factor authentication methods and device details (including the last recorded IP address).
+
+After filling `config.toml`, run:
+
+```
+./get-users-history.exe
+```
+
+Use `-config` to point to a different config file and `-output` to change the output file. The output CSV is pipe-separated and includes the following columns: `UserID`, `UserEmail`, `MFA`, `Device`. Columns `MFA` and `Device` contain JSON data for multi-factor authentication methods and device details (including the last recorded IP address).

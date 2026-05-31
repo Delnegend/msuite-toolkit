@@ -27,5 +27,11 @@ Công cụ này trích xuất lịch sử toàn diện cho từng người dùng
 - `organizational_unit_id`: tùy chọn ID OU để giới hạn kết quả người dùng theo một đơn vị tổ chức cụ thể (để trống để bỏ qua).
 
 ## Ghi chú khi chạy
-- Sau khi điền `config.toml`, chạy `./get-users-history.exe`. File đầu ra mặc định sẽ xuất hiện cùng thư mục với công cụ.
-- File đầu ra CSV phân tách bằng dấu `|` và bao gồm các cột sau: `UserID`, `UserEmail`, `MFA`, `Device`.
+
+Sau khi điền `config.toml`, chạy:
+
+```
+./get-users-history.exe
+```
+
+Dùng `-config` để chỉ file config khác và `-output` để đổi tên file đầu ra. File đầu ra CSV phân tách bằng dấu `|` và bao gồm các cột sau: `UserID`, `UserEmail`, `MFA`, `Device`.
