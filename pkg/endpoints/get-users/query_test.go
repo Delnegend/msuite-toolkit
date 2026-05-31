@@ -14,7 +14,7 @@ func TestGetUsers(t *testing.T) {
 	}
 
 	// example: default call — use builder to get defaults
-	count, users, err := GetUsers(&appState, types.NewGetUsersRequestBuilder().Build())
+	count, users, err := GetUsers(&appState, types.NewQueryRequestBuilder().Build())
 	if err != nil {
 		t.Fatalf("GetUsers failed: %v", err)
 	}
@@ -34,7 +34,7 @@ func TestGetUsersWithProgress(t *testing.T) {
 	users := GetUsersWithProgress(
 		&appState,
 		types.
-			NewGetUsersRequestBuilder().
+			NewQueryRequestBuilder().
 			WithFilterByOrgUnitID(appState.OrganizationalUnitID).
 			Build(),
 	)
@@ -48,7 +48,7 @@ func TestGetUsersWithCustomPayload(t *testing.T) {
 	}
 
 	// only specify fields we want to change (limit and orders) using builder pattern
-	count, users, err := GetUsers(&appState, types.NewGetUsersRequestBuilder().WithLimit(5).WithOrders(map[string]int{"created_time": -1}).Build())
+	count, users, err := GetUsers(&appState, types.NewQueryRequestBuilder().WithLimit(5).WithOrders(map[string]int{"created_time": -1}).Build())
 	if err != nil {
 		t.Fatalf("GetUsers with custom payload failed: %v", err)
 	}

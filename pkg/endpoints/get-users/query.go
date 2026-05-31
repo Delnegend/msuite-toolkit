@@ -21,10 +21,10 @@ import (
 // pass a payload with only the fields they want to change; missing fields will
 // receive reasonable defaults (offset=0, limit=100, orders by created_time asc, ...).
 // It returns the total count of users, the list of UserInfo, and any error encountered.
-func GetUsers(as *types.AppState, reqPayload types.GetUsersRequestPayload) (int, []types.UserInfo, error) {
+func GetUsers(as *types.AppState, reqPayload types.QueryRequestPayload) (int, []types.UserInfo, error) {
 	endpoint := fmt.Sprintf("https://%s/identity-api/v1/domains/default/users", as.AdminPortalAddress)
 	// The request payload is expected to be fully-initialized (use the builder
-	// `types.NewGetUsersRequestBuilder().Build()` to get defaults and override
+	// `types.NewQueryRequestBuilder().Build()` to get defaults and override
 	// only desired fields). Marshal the provided payload directly.
 	reqPayloadBytes, err := json.Marshal(reqPayload)
 	if err != nil {
@@ -77,7 +77,7 @@ func GetUsers(as *types.AppState, reqPayload types.GetUsersRequestPayload) (int,
 }
 
 // GetAllUsers fetches all users by making paginated requests.
-func GetAllUsers(as *types.AppState, basePayload types.GetUsersRequestPayload, progressPercentChan chan<- int) ([]types.UserInfo, error) {
+func GetAllUsers(as *types.AppState, basePayload types.QueryRequestPayload, progressPercentChan chan<- int) ([]types.UserInfo, error) {
 	pool := pond.NewPool(as.WorkerCount)
 
 	limit := 100

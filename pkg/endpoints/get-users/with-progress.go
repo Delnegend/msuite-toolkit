@@ -9,7 +9,7 @@ import (
 	"sync"
 )
 
-func GetUsersWithProgress(appState *types.AppState, basePayload types.GetUsersRequestPayload) []types.UserInfo {
+func GetUsersWithProgress(appState *types.AppState, basePayload types.QueryRequestPayload) []types.UserInfo {
 	fmt.Println("Fetching users...")
 	var wg sync.WaitGroup
 	progressPercentChan := make(chan int)
