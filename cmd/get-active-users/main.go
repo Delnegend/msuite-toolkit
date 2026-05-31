@@ -19,7 +19,7 @@ func main() {
 	users, err := get_users.GetAllUsers(
 		as,
 		types.
-			NewGetUsersRequestBuilder().
+			NewQueryRequestBuilder().
 			WithFilterByOrgUnitID(as.OrganizationalUnitID).
 			Build(),
 		nil,
