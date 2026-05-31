@@ -15,3 +15,13 @@ This tool extracts all provision policies from the M-Suite system. The output CS
 - `-config`: path to config file (default: `./config.toml`)
 - `-output`: path to output CSV file (default: `provision_policies.csv`)
 - `-h` or `-help`: show help
+
+## Run notes
+
+After filling `config.toml`, run:
+
+```
+./get-provision-policies.exe
+```
+
+Use `-config` to point to a different config file and `-output` to change the output file.

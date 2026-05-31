@@ -15,3 +15,13 @@ Công cụ này trích xuất tất cả các chính sách cấp phát từ hệ
 - `-config`: đường dẫn tới file config (mặc định: `./config.toml`)
 - `-output`: đường dẫn file CSV đầu ra (mặc định: `provision_policies.csv`)
 - `-h` hoặc `-help`: hiển thị trợ giúp
+
+## Ghi chú khi chạy
+
+Sau khi điền `config.toml`, chạy:
+
+```
+./get-provision-policies.exe
+```
+
+Dùng `-config` để chỉ file config khác và `-output` để đổi tên file đầu ra.
