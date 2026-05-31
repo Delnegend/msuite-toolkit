@@ -36,7 +36,7 @@ After copying the correct `.justfile` for your system, you can build and run usi
   ```bash
   just build NAME
   ```
-  (Where `NAME` is one of the folders in `cmd/`, like `users-devices`)
+  (Where `NAME` is one of the tool names inside `cmd/` folder, like `users-devices`)
 
 - **Run build-and-test:**
   ```bash
@@ -56,7 +56,7 @@ Most tools support the following flags:
 - `-h` or `-help`: Show help
 
 ## Build & Distribute
-Use the `build` recipe to produce a user-facing directory in `dist/{{tool-name}}/` which includes the binary, the tool-specific README, and a template `config.toml`. Deliver the entire folder to end users.
+Use the `build` recipe to produce a user-facing folder for each tool. Deliver the entire folder to end users.
 
 ## See also
-- Repository config template: [config.toml](config.toml)
+- Repository config file: [config.toml](config.toml)
