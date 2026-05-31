@@ -3,9 +3,11 @@ set shell := ["powershell.exe", "-NoLogo", "-Command"]
 
 # Build a CLI tool from ./cmd/<name> into ./dist/<name>
 build NAME:
-	if (!(Test-Path -Path "dist/{{NAME}}")) { New-Item -ItemType Directory -Path "dist/{{NAME}}" -Force | Out-Null }
+	if (Test-Path -Path "dist/{{NAME}}") { Remove-Item -Path "dist/{{NAME}}" -Recurse -Force }
+	New-Item -ItemType Directory -Path "dist/{{NAME}}" -Force | Out-Null
 	go build -o "dist/{{NAME}}/{{NAME}}.exe" "./cmd/{{NAME}}"
 	if (Test-Path -Path "cmd/{{NAME}}/README.md") { Copy-Item "cmd/{{NAME}}/README.md" "dist/{{NAME}}/README.md" -Force }
+	if (Test-Path -Path "cmd/{{NAME}}/README.vi.md") { Copy-Item "cmd/{{NAME}}/README.vi.md" "dist/{{NAME}}/README.vi.md" -Force }
 	# Prefer a command-specific config if present, otherwise fall back to repo root config.toml
 	if (Test-Path -Path "cmd/{{NAME}}/config.toml") {
 		Copy-Item "cmd/{{NAME}}/config.toml" "dist/{{NAME}}/config.toml" -Force
