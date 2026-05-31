@@ -23,5 +23,11 @@ Công cụ này trích xuất danh sách tất cả các thiết bị liên kế
 - `organizational_unit_id`: tùy chọn ID OU để giới hạn kết quả người dùng theo một đơn vị tổ chức cụ thể (để trống để bỏ qua).
 
 ## Ghi chú khi chạy
-- Sau khi điền `config.toml`, chạy `./get-user-devices.exe`. File đầu ra mặc định sẽ xuất hiện cùng thư mục với công cụ.
-- File đầu ra CSV phân tách bằng dấu `|` và bao gồm các cột sau: `UserID`, `UserEmail`, `DeviceID`, `DeviceName`, `DeviceType`, `LastUsed`.
+
+Sau khi điền `config.toml`, chạy:
+
+```
+./get-user-devices.exe
+```
+
+Dùng `-config` để chỉ file config khác và `-output` để đổi tên file đầu ra. File đầu ra CSV phân tách bằng dấu `|` và bao gồm các cột sau: `UserID`, `UserEmail`, `DeviceID`, `DeviceName`, `DeviceType`, `LastUsed`.

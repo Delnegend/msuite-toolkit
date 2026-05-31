@@ -23,6 +23,12 @@ This tool extracts a list of all devices associated with each user in the system
 - `organizational_unit_id`: optional OU id to restrict user results to a specific organizational unit (leave blank to ignore).
 
 ## Run notes
-- After filling `config.toml`, run `./get-user-devices.exe`. The default output file will be created next to the tool.
-- The output CSV is pipe-separated and includes the following columns: `UserID`, `UserEmail`, `DeviceID`, `DeviceName`, `DeviceType`, `LastUsed`.
+
+After filling `config.toml`, run:
+
+```
+./get-user-devices.exe
+```
+
+Use `-config` to point to a different config file and `-output` to change the output file. The output CSV is pipe-separated and includes the following columns: `UserID`, `UserEmail`, `DeviceID`, `DeviceName`, `DeviceType`, `LastUsed`.
 
