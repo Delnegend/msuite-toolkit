@@ -6,10 +6,17 @@ This tool extracts MFA status and a history of failed login attempts for each us
 ## Quick steps
 - Ensure M-Suite is open, turned on, and the Admin Portal app is present in the app list.
 - Fill `config.toml` (see instructions below).
-- Open a terminal in this directory (right-click this folder and select "Open in Terminal") and run the tool:
+ - Fill `config.toml` (see instructions below).
+
+## Run notes
+
+After filling `config.toml`, run:
+
 ```
 ./get-users-logins.exe
 ```
+
+Use `-config` to point to a different config file and `-output` to change the output file.
 
 ## Flags
 - `-config`: path to config file (default: `./config.toml`)

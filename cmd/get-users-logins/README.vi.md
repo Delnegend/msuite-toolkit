@@ -6,10 +6,16 @@ Công cụ này trích xuất trạng thái MFA và lịch sử các lần đăn
 ## Các bước nhanh
 - Đảm bảo M-Suite đang mở, đã bật, và ứng dụng Admin Portal xuất hiện trong danh sách ứng dụng.
 - Điền `config.toml` theo hướng dẫn bên dưới.
-- Mở terminal trong thư mục này (nhấp chuột phải vào thư mục này và chọn "Open in Terminal") và chạy:
+
+## Ghi chú khi chạy
+
+Sau khi điền `config.toml`, chạy:
+
 ```
 ./get-users-logins.exe
 ```
+
+Dùng `-config` để chỉ file config khác và `-output` để đổi tên file đầu ra.
 
 ## Tham số
 - `-config`: đường dẫn tới file config (mặc định: `./config.toml`)
