@@ -55,37 +55,13 @@ func GetUserDevices(as *types.AppState, userID string) ([]types.DeviceInfo, erro
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	// parse only the fields we care about
 	var respPayload struct {
-		Data []struct {
-			DeviceID    string `json:"device_id"`
-			DeviceName  string `json:"device_name"`
-			UpdatedTime int64  `json:"updated_time"`
-			MetaData    struct {
-				OS            string `json:"os"`
-				OSFamily      string `json:"os_family"`
-				ProductName   string `json:"product_name"`
-				ProductVendor string `json:"product_vendor"`
-			} `json:"meta_data"`
-		} `json:"data"`
+		Data []types.DeviceInfo `json:"data"`
 	}
 	if err := json.Unmarshal(body, &respPayload); err != nil {
 		slog.Error("unmarshalling response failed", "err", err)
 		return nil, fmt.Errorf("unmarshalling response failed: %w", err)
 	}
 
-	devices := make([]types.DeviceInfo, 0, len(respPayload.Data))
-	for _, d := range respPayload.Data {
-		devices = append(devices, types.DeviceInfo{
-			DeviceID:      d.DeviceID,
-			DeviceName:    d.DeviceName,
-			UpdatedTime:   d.UpdatedTime,
-			ProductName:   d.MetaData.ProductName,
-			ProductVendor: d.MetaData.ProductVendor,
-			OS:            d.MetaData.OS,
-			OSFamily:      d.MetaData.OSFamily,
-		})
-	}
-
-	return devices, nil
+	return respPayload.Data, nil
 }

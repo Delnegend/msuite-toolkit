@@ -22,7 +22,7 @@ func TestGetUserDevices(t *testing.T) {
 	t.Logf("User devices count: %d", len(devices))
 	for i, device := range devices {
 		if i < 5 {
-			t.Logf("Device %d: ID=%s, Name=%s, OS=%s", i, device.DeviceID, device.DeviceName, device.OS)
+			t.Logf("Device %d: ID=%s, Name=%s, OS=%s", i, device.DeviceID, device.DeviceName, device.MetaData.OS)
 		}
 	}
 }
