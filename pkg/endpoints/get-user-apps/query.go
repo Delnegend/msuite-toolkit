@@ -12,11 +12,6 @@ import (
 	"net/url"
 )
 
-type AppInfo struct {
-	AppID int64
-	Name  string
-}
-
 type AuthorizedApp struct {
 	App struct {
 		DomainID    string `json:"domain_id"`
@@ -109,7 +104,27 @@ type AuthorizedApp struct {
 	AccessPolicyInfos []any `json:"access_policy_infos"`
 }
 
-// GetUserApps fetches authorized apps for a user and returns a list of AppInfo.
+type SimplifiedAppInfo struct {
+	AppID           *int64  `json:"app_id"`
+	Name            *string `json:"name"`
+	DestinationHost *string `json:"destination_host"`
+	DestinationPort *int    `json:"destination_port"`
+	AccessRuleID    *string `json:"access_rule_id"`
+	AccessRuleName  *string `json:"access_rule_name"`
+}
+
+func (a *AuthorizedApp) ToSimplifiedAppInfo() *SimplifiedAppInfo {
+	return &SimplifiedAppInfo{
+		AppID:           &a.App.AppID,
+		Name:            &a.App.Name,
+		DestinationHost: &a.App.DestinationSetting.IP,
+		DestinationPort: &a.App.DestinationSetting.Port,
+		AccessRuleID:    &a.AccessRuleInfo.AccessRuleID,
+		AccessRuleName:  &a.AccessRuleInfo.AccessRuleName,
+	}
+}
+
+// GetUserApps fetches authorized apps for a user and returns a list of AuthorizedApp, which includes both app details and access rule info. This is useful for mapping users to apps with context on why they have access.
 func GetUserApps(as *types.AppState, userID string) ([]AuthorizedApp, error) {
 	endpoint := fmt.Sprintf("https://%s/sdp-api/v1/domains/default/public/users/%s/detailed_authorized_apps", as.AdminPortalAddress, userID)
 
