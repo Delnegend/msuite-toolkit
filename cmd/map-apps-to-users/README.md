@@ -8,10 +8,16 @@ This tool extracts information about which users have access to which applicatio
 ## Quick steps
 - Ensure M-Suite is open, turned on, and the Admin Portal app is present in the app list.
 - Fill `config.toml` (see instructions below).
-- Open a terminal in this directory (right-click this folder and select "Open in Terminal") and run the tool:
+
+## Run notes
+
+After filling `config.toml`, run:
+
 ```
 ./map-apps-to-users.exe
 ```
+
+Use `-config` to point to a different config file and `-output` to change the output file.
 
 ## Flags
 - `-config`: path to config file (default: `./config.toml`)
@@ -23,9 +29,25 @@ This tool extracts information about which users have access to which applicatio
 - `admin_user_id`: in the Admin Portal navigate to Identity > Users, Groups & Unit > Users, find the currently-logged-in admin user, click the result, then copy the `User ID` from Basic info.
 - `admin_portal_address`: set to the Admin Portal host:port you are using (for example `10.0.0.1:9443`).
 - `organizational_unit_id`: optional OU id to restrict user results to a specific organizational unit (leave blank to ignore).
+- `filter_by.destination_host`: optional comma-separated string of destination host values to include. Use single IPs or IPv4 ranges like `10.0.0.2-10`.
+- `filter_by.destination_port`: optional comma-separated string of destination ports to include. Use single ports or ranges like `443-5000`.
+- If `filter_by` is empty, all apps are included.
+
+## Example config
+```toml
+bearer_token = "CHANGE_ME"
+admin_user_id = "CHANGE_ME"
+admin_portal_address = "10.0.0.1:9443"
+worker_count = 16
+organizational_unit_id = ""
+
+filter_by = { destination_host = "10.0.0.1, 10.0.0.2-10", destination_port = "442, 443-5000" }
+```
+
+This example keeps only apps whose destination host is `10.0.0.1` or any IPv4 address from `10.0.0.2` through `10.0.0.10`, and whose port is `442` or any port from `443` through `5000`.
 
 ## Run notes
-- After filling `config.toml`, run `./map-apps-to-users.exe`. The default output files will be created next to the tool.
+- After filling `config.toml`, run `./map-apps-to-users.exe`. The default output files will be created next to the executable.
 - The tool generates two files:
   - `ONE-to-MANY_apps_to_users.csv`: Maps each app to a comma-separated list of user IDs.
   - `ONE-to-ONE_apps_to_users.csv`: Maps each app to a single user ID per row.

@@ -8,10 +8,16 @@ Công cụ này trích xuất thông tin về việc người dùng nào có quy
 ## Các bước nhanh
 - Đảm bảo M-Suite đang mở, đã bật, và ứng dụng Admin Portal xuất hiện trong danh sách ứng dụng.
 - Điền `config.toml` theo hướng dẫn bên dưới.
-- Mở terminal trong thư mục này (nhấp chuột phải vào thư mục này và chọn "Open in Terminal") và chạy:
+
+## Ghi chú khi chạy
+
+Sau khi điền `config.toml`, chạy:
+
 ```
 ./map-apps-to-users.exe
 ```
+
+Dùng `-config` để chỉ file config khác và `-output` để đổi tên file đầu ra.
 
 ## Tham số
 - `-config`: đường dẫn tới file config (mặc định: `./config.toml`)
@@ -23,9 +29,25 @@ Công cụ này trích xuất thông tin về việc người dùng nào có quy
 - `admin_user_id`: trong Admin Portal vào Identity > Users, Groups & Unit > Users, tìm admin đang đăng nhập và sao chép `User ID`.
 - `admin_portal_address`: địa chỉ Admin Portal (ví dụ `10.0.0.1:9443`).
 - `organizational_unit_id`: tùy chọn ID OU để giới hạn kết quả người dùng theo một đơn vị tổ chức cụ thể (để trống để bỏ qua).
+- `filter_by.destination_host`: chuỗi phân tách bằng dấu phẩy chứa các host đích cần lọc. Dùng IP đơn lẻ hoặc khoảng IPv4 như `10.0.0.2-10`.
+- `filter_by.destination_port`: chuỗi phân tách bằng dấu phẩy chứa các cổng đích cần lọc. Dùng port đơn lẻ hoặc khoảng như `443-5000`.
+- Nếu `filter_by` rỗng, tất cả ứng dụng sẽ được giữ lại.
+
+## Ví dụ cấu hình
+```toml
+bearer_token = "CHANGE_ME"
+admin_user_id = "CHANGE_ME"
+admin_portal_address = "10.0.0.1:9443"
+worker_count = 16
+organizational_unit_id = ""
+
+filter_by = { destination_host = "10.0.0.1, 10.0.0.2-10", destination_port = "442, 443-5000" }
+```
+
+Ví dụ này chỉ giữ các ứng dụng có host đích là `10.0.0.1` hoặc một địa chỉ IPv4 trong khoảng từ `10.0.0.2` đến `10.0.0.10`, và cổng là `442` hoặc trong khoảng từ `443` đến `5000`.
 
 ## Ghi chú khi chạy
-- Sau khi điền `config.toml`, chạy `./map-apps-to-users.exe`. Các file đầu ra mặc định sẽ xuất hiện cùng thư mục với công cụ.
+- Sau khi điền `config.toml`, chạy `./map-apps-to-users.exe`. Các file đầu ra mặc định sẽ xuất hiện cùng thư mục với file thực thi.
 - Công cụ tạo ra hai file:
   - `ONE-to-MANY_apps_to_users.csv`: Ánh xạ mỗi ứng dụng tới danh sách User ID phân tách bằng dấu phẩy.
   - `ONE-to-ONE_apps_to_users.csv`: Ánh xạ mỗi ứng dụng tới một User ID trên mỗi dòng.
