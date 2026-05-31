@@ -1,0 +1,13 @@
+bearer_token = "your_admin_portal_access_token_here"
+admin_user_id = "your_admin_user_id_here"
+admin_portal_address = "10.0.0.1:9443"
+worker_count = 16
+
+# The threshold for setting users as inactive. Users with last login older than this threshold will be set as inactive.
+last_login_threshold_in_month = 3
+
+dry_run = true
+include_users_with_unknown_last_login = false
+
+# Optional: restrict to a specific Organizational Unit ID. Leave empty to ignore.
+organizational_unit_id = ""
