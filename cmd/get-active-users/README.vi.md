@@ -8,11 +8,17 @@ Lọc "active":
 - `organizational_unit_id`: tùy chọn giới hạn kết quả theo một OU cụ thể (để trống để bỏ qua)
 
 ## Các bước nhanh
-- `cmd/get-active-users/config.tom` đã có trong repo và sẽ được sử dụng mặc định.
-- Chạy công cụ từ thư mục này:
+- Một file `config.toml` đã có trong thư mục này và sẽ được dùng mặc định.
+
+## Ghi chú khi chạy
+
+Sau khi điền `config.toml`, chạy:
+
 ```
 ./get-active-users.exe
 ```
+
+Dùng `-config` để chỉ file config khác và `-output` để đổi tên file đầu ra.
 
 ## Tham số
 - `-config`: đường dẫn tới file config (mặc định: `./config.toml`)
@@ -27,11 +33,9 @@ Lọc "active":
 - `organizational_unit_id`: ID OU nếu muốn lọc theo OU (để trống nếu không dùng).
 
 ## Ví dụ
-Repo đã chứa `cmd/get-active-users/config.tom`. `just build` sẽ đóng gói cấu hình
-riêng cho lệnh này vào `dist/`; nếu không có, `config.toml` gốc của repo sẽ được
- dùng.
+Hãy dùng `config.toml` trong thư mục này.
 Để chạy cục bộ:
 
 ```
-go run ./cmd/get-active-users -config ./cmd/get-active-users/config.toml -output actives.json
+./get-active-users.exe -config ./config.toml -output actives.json
 ```
