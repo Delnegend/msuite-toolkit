@@ -1,7 +1,7 @@
 admin_portal_address = "10.0.0.1:9443"
 bearer_token = "your_admin_portal_access_token_here"
 admin_user_id = "your_admin_user_id_here"
-worker_count = 100
+worker_count = 16
 
 # Discard users who didn't login within the last N months (0 = disabled)
 last_login_threshold_in_month = 3
