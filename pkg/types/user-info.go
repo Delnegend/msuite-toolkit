@@ -12,7 +12,7 @@ type UserInfo struct {
 	UserEmail      string            `json:"email"`
 	PhoneNumber    string            `json:"phone_number"`
 	Roles          []string          `json:"roles"`
-	OwnerInfo      any               `json:"owner_info"`
+	OwnerInfo      IdentityOwnerInfo `json:"owner_info"`
 	Meta           any               `json:"meta"`
 	Attributes     map[string]string `json:"attributes"`
 	LoginSessionID string            `json:"login_session_id"`
