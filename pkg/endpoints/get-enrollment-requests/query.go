@@ -31,6 +31,17 @@ const (
 	Rejected EnrollmentRequestStatus = "Rejected"
 )
 
+type DeviceType string
+
+const (
+	DeviceTypeUnknown DeviceType = ""
+	DeviceTypeWindows DeviceType = "windows"
+	DeviceTypeMacOS   DeviceType = "macos"
+	DeviceTypeLinux   DeviceType = "linux"
+	DeviceTypeiOS     DeviceType = "ios"
+	DeviceTypeAndroid DeviceType = "android"
+)
+
 type EnrollmentRequest struct {
 	DomainID                 string                  `json:"domain_id"`
 	EnrollmentRequestID      string                  `json:"enrollment_request_id"`
@@ -45,7 +56,7 @@ type EnrollmentRequest struct {
 	DeviceID                 string                  `json:"device_id"`
 	DeviceMACs               []string                `json:"device_macs"`
 	DeviceName               string                  `json:"device_name"`
-	DeviceType               string                  `json:"device_type"`
+	DeviceType               DeviceType              `json:"device_type"`
 	DeviceOS                 string                  `json:"device_os"`
 	DeviceOSVersion          string                  `json:"device_os_version"`
 	DeviceModel              string                  `json:"device_model"`
@@ -95,6 +106,22 @@ type EnrollmentRequest struct {
 		CreatedTime    int64    `json:"created_time"`
 	} `json:"decision_admin_info"`
 	ProvisionPolicy any `json:"provision_policy"`
+}
+
+func (er *EnrollmentRequest) IsDesktop() bool {
+	normalizedDeviceOs := strings.ToLower(er.DeviceOS)
+	return strings.Contains(normalizedDeviceOs, "windows") ||
+		strings.Contains(normalizedDeviceOs, "microsoft") ||
+		strings.Contains(normalizedDeviceOs, "mac") ||
+		strings.Contains(normalizedDeviceOs, "linux") ||
+		strings.Contains(normalizedDeviceOs, "ubuntu") ||
+		strings.Contains(normalizedDeviceOs, "debian")
+}
+
+func (er *EnrollmentRequest) IsMobile() bool {
+	normalizedDeviceOs := strings.ToLower(er.DeviceOS)
+	return strings.Contains(normalizedDeviceOs, "ios") ||
+		strings.Contains(normalizedDeviceOs, "android")
 }
 
 func (er *EnrollmentRequest) DeviceInfo(as *types.AppState) (*types.DeviceInfo, error) {

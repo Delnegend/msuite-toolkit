@@ -17,4 +17,8 @@ type AppState struct {
 	LastLoginThresholdInMonths int `toml:"last_login_threshold_in_month" json:"last_login_threshold_in_month"`
 	// organizational_unit_id: optional OU id to filter users (empty = ignore)
 	OrganizationalUnitID string `toml:"organizational_unit_id" json:"organizational_unit_id"`
+	// exclude_emails: list of user emails to exclude from deletion operations
+	ExcludeEmails []string `toml:"exclude_emails" json:"exclude_emails"`
+	// include_emails: list of user emails to include in reports (empty = include all)
+	IncludeEmails []string `toml:"include_emails" json:"include_emails"`
 }
