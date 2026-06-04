@@ -14,27 +14,110 @@ import (
 	"os"
 )
 
+type deviceWithIP struct {
+	types.DeviceInfo
+	IP types.IPAddress `json:"ip"`
+}
+
 func main() {
 	outputPath := app.Init("users_history.csv")
-
 	as := &app.AppState
 
-	users := get_users.GetUsersWithProgress(
+	users := fetchHistoryUsers(as)
+	userMFA := fetchHistoryMFA(as, users)
+	userDevices := fetchHistoryDevices(as, users)
+	usersDevicesLastIP := fetchDevicesLastIP(as, userDevices)
+	userFailedLogins := fetchHistoryFailedLogins(as, users)
+
+	writeUsersHistoryCSV(outputPath, users, userMFA, userDevices, usersDevicesLastIP, userFailedLogins)
+}
+
+// fetchHistoryUsers retrieves all users for the configured OU.
+func fetchHistoryUsers(as *types.AppState) []types.UserInfo {
+	return get_users.GetUsersWithProgress(
 		as,
-		types.
-			NewQueryRequestBuilder().
+		types.NewQueryRequestBuilder().
 			WithFilterByOrgUnitID(as.OrganizationalUnitID).Build(),
 	)
+}
 
-	userMFA := get_user_mfa.GetUsersMFAWithProgress(as, users)
+// fetchHistoryMFA retrieves MFA info for all users with progress.
+func fetchHistoryMFA(as *types.AppState, users []types.UserInfo) map[types.UserID]get_user_mfa.UserMFAInfo {
+	return get_user_mfa.GetUsersMFAWithProgress(as, users)
+}
 
-	userDevices := get_user_devices.GetUserDevicesWithProgress(as, users)
+// fetchHistoryDevices retrieves devices for all users with progress.
+func fetchHistoryDevices(as *types.AppState, users []types.UserInfo) map[string][]types.DeviceInfo {
+	return get_user_devices.GetUserDevicesWithProgress(as, users)
+}
 
-	usersDevicesLastIP := get_user_device_last_ip.GetUsersDevicesLastIPWithProgress(as, userDevices)
+// fetchDevicesLastIP retrieves the last IP for each device with progress.
+func fetchDevicesLastIP(as *types.AppState, userDevices map[string][]types.DeviceInfo) map[string]map[string]types.IPAddress {
+	return get_user_device_last_ip.GetUsersDevicesLastIPWithProgress(as, userDevices)
+}
 
-	userFailedLogins := get_user_failed_logins.GetUsersFailedLoginsWithProgress(as, users)
+// fetchHistoryFailedLogins retrieves failed login info for all users with progress.
+func fetchHistoryFailedLogins(as *types.AppState, users []types.UserInfo) map[string][]get_user_failed_logins.FailedLogin {
+	return get_user_failed_logins.GetUsersFailedLoginsWithProgress(as, users)
+}
 
-	// create CSV file
+// marshalUserMFA marshals MFA data to JSON, returning "{}" on error.
+func marshalUserMFA(mfa get_user_mfa.UserMFAInfo) string {
+	b, err := json.Marshal(mfa)
+	if err != nil {
+		slog.Error("marshalling mfa failed", "err", err)
+		return "{}"
+	}
+	return string(b)
+}
+
+// buildDevicesWithIP merges device info with last known IP for a user.
+func buildDevicesWithIP(devices []types.DeviceInfo, ips map[string]types.IPAddress) []deviceWithIP {
+	devs := make([]deviceWithIP, 0, len(devices))
+	for _, d := range devices {
+		ip := types.IPAddress("")
+		if ips != nil {
+			if v, ok := ips[d.DeviceID]; ok {
+				ip = v
+			}
+		}
+		devs = append(devs, deviceWithIP{DeviceInfo: d, IP: ip})
+	}
+	return devs
+}
+
+// marshalDevicesWithIP marshals devices with IPs to JSON, returning "[]" on error.
+func marshalDevicesWithIP(devs []deviceWithIP) string {
+	b, err := json.Marshal(devs)
+	if err != nil {
+		slog.Error("marshalling devices failed", "err", err)
+		return "[]"
+	}
+	return string(b)
+}
+
+// marshalUserFailedLogins marshals failed logins to JSON, returning "[]" on error.
+func marshalUserFailedLogins(fls []get_user_failed_logins.FailedLogin) string {
+	if fls == nil {
+		return "[]"
+	}
+	b, err := json.Marshal(fls)
+	if err != nil {
+		slog.Error("marshalling failed logins failed", "err", err)
+		return "[]"
+	}
+	return string(b)
+}
+
+// writeUsersHistoryCSV writes the full user history report to a pipe-delimited CSV.
+func writeUsersHistoryCSV(
+	outputPath *string,
+	users []types.UserInfo,
+	userMFA map[types.UserID]get_user_mfa.UserMFAInfo,
+	userDevices map[string][]types.DeviceInfo,
+	usersDevicesLastIP map[string]map[string]types.IPAddress,
+	userFailedLogins map[string][]get_user_failed_logins.FailedLogin,
+) {
 	csvFile, err := os.Create(*outputPath)
 	if err != nil {
 		slog.Error("creating csv file failed", "err", err)
@@ -50,64 +133,18 @@ func main() {
 	w.Comma = '|'
 	defer w.Flush()
 
-	// write header
 	if err := w.Write([]string{"UserID", "UserEmail", "MFA", "Device", "FailedLogins"}); err != nil {
 		slog.Error("writing csv header failed", "err", err)
 		os.Exit(1)
 	}
 
-	type deviceWithIP struct {
-		types.DeviceInfo
-		IP types.IPAddress `json:"ip"`
-	}
-
 	for _, user := range users {
-		mfaB := []byte("{}")
-		if mfa, ok := userMFA[user.UserID]; ok {
-			var err error
-			mfaB, err = json.Marshal(mfa)
-			if err != nil {
-				slog.Error("marshalling mfa failed", "err", err, "userID", user.UserID)
-				os.Exit(1)
-			}
-		}
+		mfaB := marshalUserMFA(userMFA[user.UserID])
+		devs := buildDevicesWithIP(userDevices[user.UserID], usersDevicesLastIP[user.UserID])
+		devB := marshalDevicesWithIP(devs)
+		failedLoginsB := marshalUserFailedLogins(userFailedLogins[user.UserID])
 
-		devices := userDevices[user.UserID]
-		ips := usersDevicesLastIP[user.UserID]
-		devs := make([]deviceWithIP, 0, len(devices))
-		for _, d := range devices {
-			ip := types.IPAddress("")
-			if ips != nil {
-				if v, ok := ips[d.DeviceID]; ok {
-					ip = v
-				}
-			}
-			devs = append(devs, deviceWithIP{DeviceInfo: d, IP: ip})
-		}
-
-		devB, err := json.Marshal(devs)
-		if err != nil {
-			slog.Error("marshalling devices failed", "err", err)
-			os.Exit(1)
-		}
-
-		failedLoginsB := []byte("[]")
-		if failedLogins, ok := userFailedLogins[user.UserID]; ok && failedLogins != nil {
-			var err error
-			failedLoginsB, err = json.Marshal(failedLogins)
-			if err != nil {
-				slog.Error("marshalling failed logins failed", "err", err, "userID", user.UserID)
-				os.Exit(1)
-			}
-		}
-
-		if err := w.Write([]string{
-			user.UserID,
-			user.UserEmail,
-			string(mfaB),
-			string(devB),
-			string(failedLoginsB),
-		}); err != nil {
+		if err := w.Write([]string{user.UserID, user.UserEmail, mfaB, devB, failedLoginsB}); err != nil {
 			slog.Error("writing csv row failed", "err", err)
 			os.Exit(1)
 		}

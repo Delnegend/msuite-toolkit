@@ -16,12 +16,30 @@ import (
 
 func main() {
 	outputPath := app.Init("inactive_users.csv")
+	as := &app.AppState
 
+	users := fetchInactiveCandidates(as)
+	inactiveUsers := selectInactiveUsers(users, as.LastLoginThresholdInMonths, as.IncludeUsersWithUnknownLastLogin, time.Now())
+
+	writeResultsCSV(*outputPath, buildDryRunRows(inactiveUsers))
+
+	if as.DryRun {
+		slog.Info("dry run completed", "inactive", len(inactiveUsers), "total", len(users))
+		return
+	}
+
+	confirmProceed(as)
+	results := inactivateUsers(inactiveUsers)
+	writeResultsCSV(*outputPath, results)
+	reportInactivationResults(results, len(inactiveUsers), len(users))
+}
+
+// fetchInactiveCandidates retrieves all users for the configured OU.
+func fetchInactiveCandidates(as *types.AppState) []types.UserInfo {
 	users, err := get_users.GetAllUsers(
-		&app.AppState,
-		types.
-			NewQueryRequestBuilder().
-			WithFilterByOrgUnitID(app.AppState.OrganizationalUnitID).
+		as,
+		types.NewQueryRequestBuilder().
+			WithFilterByOrgUnitID(as.OrganizationalUnitID).
 			Build(),
 		nil,
 	)
@@ -29,24 +47,13 @@ func main() {
 		slog.Error("fetching users failed", "err", err)
 		os.Exit(1)
 	}
+	return users
+}
 
-	now := time.Now()
-	inactiveUsers := selectInactiveUsers(users, app.AppState.LastLoginThresholdInMonths, app.AppState.IncludeUsersWithUnknownLastLogin, now)
-	totalUsers := len(users)
-	selectedUsers := len(inactiveUsers)
-
-	if err := writeResultsCSV(*outputPath, buildDryRunRows(inactiveUsers)); err != nil {
-		slog.Error("writing csv file failed", "err", err)
-		os.Exit(1)
-	}
-
-	if app.AppState.DryRun {
-		slog.Info("dry run completed", "inactive", selectedUsers, "total", totalUsers)
-		return
-	}
-
-	if app.AppState.LastLoginThresholdInMonths < 3 {
-		if err := confirmDangerousThreshold(app.AppState.LastLoginThresholdInMonths); err != nil {
+// confirmProceed runs interactive confirmations before inactivating users.
+func confirmProceed(as *types.AppState) {
+	if as.LastLoginThresholdInMonths < 3 {
+		if err := confirmDangerousThreshold(as.LastLoginThresholdInMonths); err != nil {
 			slog.Error("confirmation failed", "err", err)
 			os.Exit(1)
 		}
@@ -56,28 +63,32 @@ func main() {
 		slog.Error("confirmation failed", "err", err)
 		os.Exit(1)
 	}
+}
 
-	slog.Info("users selected for inactivation", "inactive", selectedUsers, "total", totalUsers)
-
-	var failed int
-	rows := make([][]string, 0, selectedUsers)
-	for _, user := range inactiveUsers {
+// inactivateUsers performs the inactivation for each user and returns result rows.
+func inactivateUsers(users []types.UserInfo) [][]string {
+	rows := make([][]string, 0, len(users))
+	for _, user := range users {
+		result := "OK"
 		if err := inactive_user.InactiveUser(&app.AppState, types.UserID(user.UserID)); err != nil {
-			msg := err.Error()
 			slog.Error("failed to inactive user", "user_id", user.UserID, "err", err)
-			failed++
-			rows = append(rows, []string{user.UserID, user.UserEmail, lastLoginString(user), msg})
-			continue
+			result = err.Error()
+		} else {
+			slog.Info("inactivated user", "user_id", user.UserID, "display_name", user.DisplayName, "email", user.UserEmail)
 		}
-		slog.Info("inactivated user", "user_id", user.UserID, "display_name", user.DisplayName, "email", user.UserEmail)
-		rows = append(rows, []string{user.UserID, user.UserEmail, lastLoginString(user), "OK"})
+		rows = append(rows, []string{user.UserID, user.UserEmail, lastLoginString(user), result})
 	}
+	return rows
+}
 
-	if err := writeResultsCSV(*outputPath, rows); err != nil {
-		slog.Error("writing csv file failed", "err", err)
-		os.Exit(1)
+// reportInactivationResults logs a summary of the inactivation run.
+func reportInactivationResults(results [][]string, selectedUsers, totalUsers int) {
+	var failed int
+	for _, r := range results {
+		if r[3] != "OK" {
+			failed++
+		}
 	}
-
 	if failed > 0 {
 		slog.Error("completed with failures", "inactive", selectedUsers, "failed", failed, "total", totalUsers)
 		os.Exit(1)
@@ -85,6 +96,8 @@ func main() {
 	slog.Info("completed", "inactive", selectedUsers, "total", totalUsers)
 }
 
+// selectInactiveUsers returns users whose last login is older than thresholdMonths
+// (or users with unknown last login if includeUnknownLastLogin is true).
 func selectInactiveUsers(users []types.UserInfo, thresholdMonths int, includeUnknownLastLogin bool, now time.Time) []types.UserInfo {
 	cutoff := now.AddDate(0, -thresholdMonths, 0)
 	var inactive []types.UserInfo
@@ -103,6 +116,7 @@ func selectInactiveUsers(users []types.UserInfo, thresholdMonths int, includeUnk
 	return inactive
 }
 
+// lastLoginString returns the user's last login time as an RFC3339 string, or empty.
 func lastLoginString(user types.UserInfo) string {
 	if lastLogin := user.LastLoginTime(); lastLogin != nil {
 		return lastLogin.UTC().Format(time.RFC3339)
@@ -110,6 +124,7 @@ func lastLoginString(user types.UserInfo) string {
 	return ""
 }
 
+// buildDryRunRows constructs CSV rows annotated with "DRY_RUN" for preview purposes.
 func buildDryRunRows(users []types.UserInfo) [][]string {
 	rows := make([][]string, 0, len(users))
 	for _, user := range users {

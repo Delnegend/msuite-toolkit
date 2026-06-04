@@ -12,19 +12,30 @@ import (
 
 func main() {
 	outputPath := app.Init("user_devices.csv")
-
 	as := &app.AppState
 
-	users := get_users.GetUsersWithProgress(
+	users := fetchUsersWithProgress(as)
+	userDevices := fetchUserDevices(as, users)
+	writeUserDevicesCSV(outputPath, users, userDevices)
+}
+
+// fetchUsersWithProgress retrieves all users for the configured OU.
+func fetchUsersWithProgress(as *types.AppState) []types.UserInfo {
+	return get_users.GetUsersWithProgress(
 		as,
 		types.NewQueryRequestBuilder().
 			WithFilterByOrgUnitID(as.OrganizationalUnitID).
 			Build(),
 	)
+}
 
-	userDevices := get_user_devices.GetUserDevicesWithProgress(as, users)
+// fetchUserDevices retrieves devices for all users with progress.
+func fetchUserDevices(as *types.AppState, users []types.UserInfo) map[string][]types.DeviceInfo {
+	return get_user_devices.GetUserDevicesWithProgress(as, users)
+}
 
-	// create CSV file
+// writeUserDevicesCSV writes the user devices to a pipe-delimited CSV.
+func writeUserDevicesCSV(outputPath *string, users []types.UserInfo, userDevices map[string][]types.DeviceInfo) {
 	csvFile, err := os.Create(*outputPath)
 	if err != nil {
 		slog.Error("creating csv file failed", "err", err)
@@ -40,13 +51,11 @@ func main() {
 	w.Comma = '|'
 	defer w.Flush()
 
-	// write header
 	if err := w.Write([]string{"UserID", "UserEmail", "DeviceID", "DeviceName", "DeviceType", "LastUsed"}); err != nil {
 		slog.Error("writing csv header failed", "err", err)
 		os.Exit(1)
 	}
 
-	// write rows
 	for _, user := range users {
 		devices, ok := userDevices[user.UserID]
 		if !ok {

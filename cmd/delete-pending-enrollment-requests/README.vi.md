@@ -4,9 +4,8 @@
 Công cụ này lấy toàn bộ enrollment request từ Admin Portal, giữ lại các request có trạng thái `pending`, rồi xóa chúng bằng bulk delete endpoint.
 
 ## Các bước nhanh
-- Đảm bảo M-Suite đang mở, đã bật, và ứng dụng Admin Portal xuất hiện trong danh sách ứng dụng.
+- Đảm bảo M-Suite đang mở, đã bật, và ứng dụng Admin Portal có trong danh sách ứng dụng.
 - Điền `config.toml` theo hướng dẫn bên dưới.
- - Điền `config.toml` theo hướng dẫn bên dưới.
 
 ## Ghi chú khi chạy
 
@@ -24,12 +23,17 @@ Dùng `-config` để chỉ file config khác.
 
 ## Cách điền `config.toml`
 - `bearer_token`: lấy từ local storage của Admin Portal, khóa `admin_portal_access_token`.
-- `admin_user_id`: User ID của admin đang đăng nhập trong Admin Portal.
+- `admin_user_id`: User ID của admin trong Admin Portal.
 - `admin_portal_address`: địa chỉ Admin Portal (ví dụ `10.0.0.1:9443`).
 - `worker_count`: cấu hình số luồng cho các request phân trang (mặc định: `100`).
+- `dry_run`: đặt `true` để xem trước (không xóa thật, ghi `to-be-deleted-pending-enrollment-requests.csv`); đặt `false` để xóa thật (ghi `deleted-pending-enrollment-requests.csv`).
+
+Báo cáo (CSV)
+- `deleted-pending-enrollment-requests.csv` / `to-be-deleted-pending-enrollment-requests.csv` — các request đang chờ đã (hoặc sẽ) bị xóa.
+- `excluded-pending-enrollment-requests.csv` — các request được giữ lại vì trạng thái không phải `Pending`.
 
 ## Ví dụ
-Hãy dùng `config.toml` trong thư mục này. Để chạy cục bộ:
+Dùng `config.toml` ở thư mục gốc. Để chạy cục bộ:
 
 ```
 ./delete-pending-enrollment-requests.exe -config ./config.toml

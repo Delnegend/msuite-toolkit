@@ -14,22 +14,62 @@ import (
 
 func main() {
 	outputPath := app.Init("users_logins.csv")
-
 	as := &app.AppState
 
-	users := get_users.GetUsersWithProgress(
+	users := fetchUsersFromOU(as)
+	userMFA := fetchUsersMFA(as, users)
+	userFailedLogins := fetchUsersFailedLogins(as, users)
+	writeUsersLoginsCSV(outputPath, users, userMFA, userFailedLogins)
+}
+
+// fetchUsersFromOU retrieves all users for the configured OU.
+func fetchUsersFromOU(as *types.AppState) []types.UserInfo {
+	return get_users.GetUsersWithProgress(
 		as,
-		types.
-			NewQueryRequestBuilder().
+		types.NewQueryRequestBuilder().
 			WithFilterByOrgUnitID(as.OrganizationalUnitID).
 			Build(),
 	)
+}
 
-	userMFA := get_user_mfa.GetUsersMFAWithProgress(as, users)
+// fetchUsersMFA retrieves MFA info for all users with progress.
+func fetchUsersMFA(as *types.AppState, users []types.UserInfo) map[types.UserID]get_user_mfa.UserMFAInfo {
+	return get_user_mfa.GetUsersMFAWithProgress(as, users)
+}
 
-	userFailedLogins := get_user_failed_logins.GetUsersFailedLoginsWithProgress(as, users)
+// fetchUsersFailedLogins retrieves failed login info for all users with progress.
+func fetchUsersFailedLogins(as *types.AppState, users []types.UserInfo) map[string][]get_user_failed_logins.FailedLogin {
+	return get_user_failed_logins.GetUsersFailedLoginsWithProgress(as, users)
+}
 
-	// create CSV file
+// marshalMFA marshals MFA data to JSON, returning "{}" on empty or error.
+func marshalMFA(mfa any) string {
+	if mfa == nil {
+		return "{}"
+	}
+	b, err := json.Marshal(mfa)
+	if err != nil {
+		slog.Error("marshalling mfa failed", "err", err)
+		return "{}"
+	}
+	return string(b)
+}
+
+// marshalFailedLogins marshals failed logins to JSON, returning "[]" on empty or error.
+func marshalFailedLogins(fls []get_user_failed_logins.FailedLogin) string {
+	if len(fls) == 0 {
+		return "[]"
+	}
+	b, err := json.Marshal(fls)
+	if err != nil {
+		slog.Error("marshalling failed logins failed", "err", err)
+		return "[]"
+	}
+	return string(b)
+}
+
+// writeUsersLoginsCSV writes user login data to a pipe-delimited CSV.
+func writeUsersLoginsCSV(outputPath *string, users []types.UserInfo, userMFA map[types.UserID]get_user_mfa.UserMFAInfo, userFailedLogins map[string][]get_user_failed_logins.FailedLogin) {
 	csvFile, err := os.Create(*outputPath)
 	if err != nil {
 		slog.Error("creating csv file failed", "err", err)
@@ -45,40 +85,16 @@ func main() {
 	w.Comma = '|'
 	defer w.Flush()
 
-	// write header
 	if err := w.Write([]string{"User ID", "Email", "MFA", "Failed logins"}); err != nil {
 		slog.Error("writing csv header failed", "err", err)
 		os.Exit(1)
 	}
 
-	// write rows
 	for _, user := range users {
-		mfaB := []byte("{}")
-		if mfa, ok := userMFA[user.UserID]; ok {
-			var err error
-			mfaB, err = json.Marshal(mfa)
-			if err != nil {
-				slog.Error("marshalling mfa failed", "err", err, "userID", user.UserID)
-				os.Exit(1)
-			}
-		}
+		mfaB := marshalMFA(userMFA[user.UserID])
+		failedLoginsB := marshalFailedLogins(userFailedLogins[user.UserID])
 
-		failedLoginsB := []byte("[]")
-		if fls, ok := userFailedLogins[user.UserID]; ok && len(fls) > 0 {
-			var err error
-			failedLoginsB, err = json.Marshal(fls)
-			if err != nil {
-				slog.Error("marshalling failed logins failed", "err", err, "userID", user.UserID)
-				os.Exit(1)
-			}
-		}
-
-		if err := w.Write([]string{
-			user.UserID,
-			user.UserEmail,
-			string(mfaB),
-			string(failedLoginsB),
-		}); err != nil {
+		if err := w.Write([]string{user.UserID, user.UserEmail, mfaB, failedLoginsB}); err != nil {
 			slog.Error("writing csv row failed", "err", err)
 			os.Exit(1)
 		}

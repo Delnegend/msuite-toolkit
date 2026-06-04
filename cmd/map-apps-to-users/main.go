@@ -18,19 +18,53 @@ func main() {
 
 	as := &app.AppState
 
-	users := get_users.GetUsersWithProgress(
+	users := fetchUsers(as)
+	users = filterUsersByIncludeEmails(users, as.IncludeEmails)
+	appsMap := fetchUserApps(as, users)
+	filteredAppsMap := filterAppsByDestination(appsMap, as.FilterBy.DestinationHost, as.FilterBy.DestinationPort)
+
+	writeOneAppToManyUsersCSV(outputPath, filteredAppsMap)
+	writeOneUserToOneAppCSV(outputPath, filteredAppsMap)
+	writeOneUserToManyAppsCSV(outputPath, filteredAppsMap)
+}
+
+// fetchUsers retrieves all users for the configured OU.
+func fetchUsers(as *types.AppState) []types.UserInfo {
+	return get_users.GetUsersWithProgress(
 		as,
 		types.
 			NewQueryRequestBuilder().
 			WithFilterByOrgUnitID(as.OrganizationalUnitID).
 			Build(),
 	)
+}
 
-	appsMap := get_user_apps.GetUserAppsWithProgress(as, users)
-	filteredAppsMap := filterAppsByDestination(appsMap, as.FilterBy.DestinationHost, as.FilterBy.DestinationPort)
+// fetchUserApps retrieves the authorized apps for each user.
+func fetchUserApps(as *types.AppState, users []types.UserInfo) map[*get_user_apps.AuthorizedApp][]string {
+	return get_user_apps.GetUserAppsWithProgress(as, users)
+}
 
-	// ONE APP to MANY USERS
+// filterUsersByIncludeEmails narrows the user list to only those whose email
+// appears in includeEmails. When includeEmails is empty, all users pass through.
+func filterUsersByIncludeEmails(users []types.UserInfo, includeEmails []string) []types.UserInfo {
+	if len(includeEmails) == 0 {
+		return users
+	}
+	includeSet := make(map[string]struct{}, len(includeEmails))
+	for _, e := range includeEmails {
+		includeSet[e] = struct{}{}
+	}
+	filtered := make([]types.UserInfo, 0, len(users))
+	for _, u := range users {
+		if _, ok := includeSet[u.UserEmail]; ok {
+			filtered = append(filtered, u)
+		}
+	}
+	return filtered
+}
 
+// writeOneAppToManyUsersCSV writes a CSV mapping each app to the list of users assigned to it.
+func writeOneAppToManyUsersCSV(outputPath *string, appsMap map[*get_user_apps.AuthorizedApp][]string) {
 	csvFile, err := os.Create(fmt.Sprintf("ONE_APP-to-MANY_USERS_%s", *outputPath))
 	if err != nil {
 		slog.Error("creating csv file failed", "err", err)
@@ -51,15 +85,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	for app, users := range filteredAppsMap {
-
-		if err := w.Write(
-			[]string{
-				fmt.Sprintf("%s (%d)", app.App.Name, app.App.AppID),
-				app.App.DestinationSetting.IPDef,
-				app.App.DestinationSetting.PortDef,
-				strings.Join(users, ","),
-			}); err != nil {
+	for app, users := range appsMap {
+		if err := w.Write([]string{
+			fmt.Sprintf("%s (%d)", app.App.Name, app.App.AppID),
+			app.App.DestinationSetting.IPDef,
+			app.App.DestinationSetting.PortDef,
+			strings.Join(users, ","),
+		}); err != nil {
 			slog.Error("writing csv row failed", "err", err)
 			os.Exit(1)
 		}
@@ -69,113 +101,119 @@ func main() {
 		slog.Error("csv writer encountered error", "err", err)
 		os.Exit(1)
 	}
+}
 
-	// ONE USER to ONE APP
-
-	csvFile2, err := os.Create(fmt.Sprintf("ONE_USER-to-ONE_APP_%s", *outputPath))
+// writeOneUserToOneAppCSV writes a CSV with one row per user-app pair.
+func writeOneUserToOneAppCSV(outputPath *string, appsMap map[*get_user_apps.AuthorizedApp][]string) {
+	csvFile, err := os.Create(fmt.Sprintf("ONE_USER-to-ONE_APP_%s", *outputPath))
 	if err != nil {
 		slog.Error("creating csv file failed", "err", err)
 		os.Exit(1)
 	}
 	defer func() {
-		if err := csvFile2.Close(); err != nil {
+		if err := csvFile.Close(); err != nil {
 			slog.Error("closing csv file failed", "err", err)
 		}
 	}()
 
-	w2 := csv.NewWriter(csvFile2)
-	w2.Comma = '|'
-	defer w2.Flush()
+	w := csv.NewWriter(csvFile)
+	w.Comma = '|'
+	defer w.Flush()
 
-	if err := w2.Write([]string{"User Email", "App Name (ID)", "Destination Host", "Destination Port"}); err != nil {
+	if err := w.Write([]string{"User Email", "App Name (ID)", "Destination Host", "Destination Port"}); err != nil {
 		slog.Error("writing csv header failed", "err", err)
 		os.Exit(1)
 	}
 
-	for app, users := range filteredAppsMap {
-
+	for app, users := range appsMap {
 		for _, userEmail := range users {
-			if err := w2.Write(
-				[]string{
-					userEmail,
-					fmt.Sprintf("%s (%d)",
-						app.App.Name, app.App.AppID),
-					app.App.DestinationSetting.IPDef,
-					app.App.DestinationSetting.PortDef,
-				}); err != nil {
+			if err := w.Write([]string{
+				userEmail,
+				fmt.Sprintf("%s (%d)", app.App.Name, app.App.AppID),
+				app.App.DestinationSetting.IPDef,
+				app.App.DestinationSetting.PortDef,
+			}); err != nil {
 				slog.Error("writing csv row failed", "err", err)
 				os.Exit(1)
 			}
 		}
 	}
 
-	if err := w2.Error(); err != nil {
+	if err := w.Error(); err != nil {
 		slog.Error("csv writer encountered error", "err", err)
 		os.Exit(1)
 	}
+}
 
-	// ONE USER to MANY APPS
+// buildUserToAppsMap inverts the app→users map into a user→apps map.
+func buildUserToAppsMap(appsMap map[*get_user_apps.AuthorizedApp][]string) map[types.UserEmail][]*get_user_apps.AuthorizedApp {
+	userToAppsMap := make(map[types.UserEmail][]*get_user_apps.AuthorizedApp)
+	for app, users := range appsMap {
+		for _, user := range users {
+			userToAppsMap[user] = append(userToAppsMap[user], app)
+		}
+	}
+	return userToAppsMap
+}
 
-	csvFile3, err := os.Create(fmt.Sprintf("ONE_USER-to-MANY_APPS_%s", *outputPath))
+// writeOneUserToManyAppsCSV writes a CSV mapping each user to all their apps.
+func writeOneUserToManyAppsCSV(outputPath *string, appsMap map[*get_user_apps.AuthorizedApp][]string) {
+	csvFile, err := os.Create(fmt.Sprintf("ONE_USER-to-MANY_APPS_%s", *outputPath))
 	if err != nil {
 		slog.Error("creating csv file failed", "err", err)
 		os.Exit(1)
 	}
 	defer func() {
-		if err := csvFile3.Close(); err != nil {
+		if err := csvFile.Close(); err != nil {
 			slog.Error("closing csv file failed", "err", err)
 		}
 	}()
 
-	w3 := csv.NewWriter(csvFile3)
-	w3.Comma = '|'
-	defer w3.Flush()
+	w := csv.NewWriter(csvFile)
+	w.Comma = '|'
+	defer w.Flush()
 
-	if err := w3.Write([]string{"User", "Apps", "Apps JSON"}); err != nil {
+	if err := w.Write([]string{"User", "Apps", "Apps JSON"}); err != nil {
 		slog.Error("writing csv header failed", "err", err)
 		os.Exit(1)
 	}
 
-	userToAppsMap := make(map[types.UserEmail][]*get_user_apps.AuthorizedApp)
-	for app, users := range filteredAppsMap {
-		for _, user := range users {
-			userToAppsMap[user] = append(userToAppsMap[user], app)
-		}
-	}
-
+	userToAppsMap := buildUserToAppsMap(appsMap)
 	for user, apps := range userToAppsMap {
-		if err := w3.Write(
-			[]string{
-				user,
-				func() string {
-					var appStrings []string
-					for _, app := range apps {
-						appStrings = append(appStrings, fmt.Sprintf("%s (%d)", app.App.Name, app.App.AppID))
-					}
-					return strings.Join(appStrings, ",")
-				}(),
-				func() string {
-					// jsonData, err := json.Marshal(apps)
-					var simplifiedApps []*get_user_apps.SimplifiedAppInfo
-					for _, app := range apps {
-						simplifiedAppInfo := app.ToSimplifiedAppInfo()
-						simplifiedApps = append(simplifiedApps, simplifiedAppInfo)
-					}
-					jsonData, err := json.Marshal(simplifiedApps)
-					if err != nil {
-						slog.Error("marshaling apps to JSON failed", "err", err)
-						return "[]"
-					}
-					return string(jsonData)
-				}(),
-			}); err != nil {
+		appNames := formatAppNames(apps)
+		appsJSON := marshalAppsJSON(apps)
+
+		if err := w.Write([]string{user, appNames, appsJSON}); err != nil {
 			slog.Error("writing csv row failed", "err", err)
 			os.Exit(1)
 		}
 	}
 
-	if err := w3.Error(); err != nil {
+	if err := w.Error(); err != nil {
 		slog.Error("csv writer encountered error", "err", err)
 		os.Exit(1)
 	}
+}
+
+// formatAppNames returns a comma-separated string of "Name (ID)" for each app.
+func formatAppNames(apps []*get_user_apps.AuthorizedApp) string {
+	var appStrings []string
+	for _, app := range apps {
+		appStrings = append(appStrings, fmt.Sprintf("%s (%d)", app.App.Name, app.App.AppID))
+	}
+	return strings.Join(appStrings, ",")
+}
+
+// marshalAppsJSON serializes the apps to a JSON array of simplified app info.
+func marshalAppsJSON(apps []*get_user_apps.AuthorizedApp) string {
+	var simplifiedApps []*get_user_apps.SimplifiedAppInfo
+	for _, app := range apps {
+		simplifiedApps = append(simplifiedApps, app.ToSimplifiedAppInfo())
+	}
+	jsonData, err := json.Marshal(simplifiedApps)
+	if err != nil {
+		slog.Error("marshaling apps to JSON failed", "err", err)
+		return "[]"
+	}
+	return string(jsonData)
 }
