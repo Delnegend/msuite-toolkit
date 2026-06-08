@@ -2,11 +2,14 @@ bearer_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyOjY0MjU5ZGZ
 admin_user_id = "64259dfefd67f33b5128c8f0"
 admin_portal_address = "10.254.148.112:9443"
 worker_count = 16
-organizational_unit_id = "64620f8bd9c393f77c1ac691"
 dry_run = false
 
-# Optional: list of user emails whose enrollment requests should NOT be deleted
-exclude_emails = ["tuhv3@viettel.com.vn",
+# Required: the group that the users below will be added to.
+group_id = "6a22b46a8ce03e572462784f"
+
+# Required: list of user emails to add to the group. Each email is resolved to a
+# user ID, then the users are added in batches of 10.
+emails = ["tuhv3@viettel.com.vn",
 "sonvv@viettel.com.vn",
 "tanpv8@viettel.com.vn",
 "truongnx191@viettel.com.vn",
@@ -158,3 +161,4 @@ exclude_emails = ["tuhv3@viettel.com.vn",
 "vu_duy@viettel.com.vn",
 "quyetnv5@viettel.com.vn",
 "sonhb@viettel.com.vn"]
+

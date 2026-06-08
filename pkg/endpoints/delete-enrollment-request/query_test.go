@@ -50,7 +50,7 @@ func TestDeleteEnrollmentRequests(t *testing.T) {
 	}
 
 	ids := []string{"69e20d7bd7b24bc736073c84", "..."}
-	if err := DeleteEnrollmentRequests(as, ids); err != nil {
+	if err := DeleteEnrollmentRequests(as, ids, nil); err != nil {
 		t.Fatalf("DeleteEnrollmentRequests failed: %v", err)
 	}
 
