@@ -1,4 +1,4 @@
-package delete_enrollement_request
+package add_users_to_group
 
 import (
 	"bytes"
@@ -18,24 +18,27 @@ import (
 
 var getHTTPClient = httpclient.GetHTTPClient
 
-// deleteBatchSize is the maximum number of enrollment request IDs sent to the
-// bulk delete endpoint in a single request.
-const deleteBatchSize = 10
+// addBatchSize is the maximum number of user IDs sent to the add-users endpoint
+// in a single request.
+const addBatchSize = 10
 
-type deleteEnrollmentRequestsPayload struct {
-	Value []string `json:"value"`
+type addUsersToGroupPayload struct {
+	UserIDs []string `json:"user_ids"`
 }
 
-// DeleteEnrollmentRequests deletes the provided enrollment requests through the
-// bulk delete endpoint, splitting them into batches of deleteBatchSize that are
-// deleted concurrently via a worker pool. When progressPercentChan is non-nil,
+// AddUsersToGroup adds the provided users to the given group through the bulk
+// add endpoint, splitting them into batches of addBatchSize that are sent
+// concurrently via a worker pool. When progressPercentChan is non-nil,
 // completion progress (0-100) is reported as batches finish.
-func DeleteEnrollmentRequests(as *types.AppState, enrollmentRequestIDs []string, progressPercentChan chan<- int) error {
-	if len(enrollmentRequestIDs) == 0 {
-		return fmt.Errorf("no enrollment request ids provided")
+func AddUsersToGroup(as *types.AppState, groupID string, userIDs []string, progressPercentChan chan<- int) error {
+	if groupID == "" {
+		return fmt.Errorf("no group id provided")
+	}
+	if len(userIDs) == 0 {
+		return fmt.Errorf("no user ids provided")
 	}
 
-	totalBatches := (len(enrollmentRequestIDs) + deleteBatchSize - 1) / deleteBatchSize
+	totalBatches := (len(userIDs) + addBatchSize - 1) / addBatchSize
 
 	if progressPercentChan != nil {
 		select {
@@ -49,18 +52,18 @@ func DeleteEnrollmentRequests(as *types.AppState, enrollmentRequestIDs []string,
 	var completed int32
 
 	for batchIndex := 0; batchIndex < totalBatches; batchIndex++ {
-		start := batchIndex * deleteBatchSize
-		end := start + deleteBatchSize
-		if end > len(enrollmentRequestIDs) {
-			end = len(enrollmentRequestIDs)
+		start := batchIndex * addBatchSize
+		end := start + addBatchSize
+		if end > len(userIDs) {
+			end = len(userIDs)
 		}
-		batch := enrollmentRequestIDs[start:end]
+		batch := userIDs[start:end]
 		batchNumber := batchIndex + 1
 
 		task := pool.SubmitErr(func() error {
-			err := deleteEnrollmentRequestsBatch(as, batch)
+			err := addUsersToGroupBatch(as, groupID, batch)
 			if err != nil {
-				slog.Error("deleting enrollment requests batch failed", "batch", batchNumber, "total_batches", totalBatches, "err", err)
+				slog.Error("adding users to group batch failed", "batch", batchNumber, "total_batches", totalBatches, "err", err)
 			}
 
 			done := atomic.AddInt32(&completed, 1)
@@ -73,7 +76,7 @@ func DeleteEnrollmentRequests(as *types.AppState, enrollmentRequestIDs []string,
 			}
 
 			if err != nil {
-				return fmt.Errorf("deleting batch %d/%d failed: %w", batchNumber, totalBatches, err)
+				return fmt.Errorf("adding batch %d/%d failed: %w", batchNumber, totalBatches, err)
 			}
 			return nil
 		})
@@ -103,11 +106,11 @@ func DeleteEnrollmentRequests(as *types.AppState, enrollmentRequestIDs []string,
 	return nil
 }
 
-// deleteEnrollmentRequestsBatch deletes a single batch of enrollment requests
-// through the bulk delete endpoint.
-func deleteEnrollmentRequestsBatch(as *types.AppState, enrollmentRequestIDs []string) error {
-	endpoint := fmt.Sprintf("https://%s/enrollment-api/v1/domains/default/enrollment_requests/@all/delete", as.AdminPortalAddress)
-	payloadBytes, err := json.Marshal(deleteEnrollmentRequestsPayload{Value: enrollmentRequestIDs})
+// addUsersToGroupBatch adds a single batch of users to the group through the
+// bulk add endpoint.
+func addUsersToGroupBatch(as *types.AppState, groupID string, userIDs []string) error {
+	endpoint := fmt.Sprintf("https://%s/identity-api/v1/domains/default/groups/%s/users/@/all/add", as.AdminPortalAddress, groupID)
+	payloadBytes, err := json.Marshal(addUsersToGroupPayload{UserIDs: userIDs})
 	if err != nil {
 		slog.Error("marshalling request payload failed", "err", err)
 		return fmt.Errorf("marshalling request payload failed: %w", err)

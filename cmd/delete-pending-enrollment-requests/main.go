@@ -77,7 +77,7 @@ func deletePendingRequests(as *types.AppState, candidates []get_enrollment_reque
 	requestIDs := extractRequestIDs(candidates)
 	slog.Info("deleting pending enrollment requests", "total_fetched", totalFetched, "to_delete", len(requestIDs), "excluded", totalFetched-len(requestIDs))
 
-	if err := delete_enrollment_request.DeleteEnrollmentRequests(as, requestIDs); err != nil {
+	if err := delete_enrollment_request.DeleteEnrollmentRequestsWithProgress(as, requestIDs); err != nil {
 		slog.Error("deleting pending enrollment requests failed", "err", err)
 		os.Exit(1)
 	}

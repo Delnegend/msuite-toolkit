@@ -21,4 +21,8 @@ type AppState struct {
 	ExcludeEmails []string `toml:"exclude_emails" json:"exclude_emails"`
 	// include_emails: list of user emails to include in reports (empty = include all)
 	IncludeEmails []string `toml:"include_emails" json:"include_emails"`
+	// group_id: target group id for group membership operations (e.g. add-users-to-group)
+	GroupID string `toml:"group_id" json:"group_id"`
+	// emails: list of user emails to operate on (e.g. add-users-to-group)
+	Emails []string `toml:"emails" json:"emails"`
 }

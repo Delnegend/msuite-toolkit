@@ -86,7 +86,7 @@ func deleteRequests(as *types.AppState, candidates []get_enrollment_requests.Enr
 	requestIDs := extractRequestIDs(candidates)
 	slog.Info("deleting enrollment requests", "total_fetched", totalFetched, "to_delete", len(requestIDs), "excluded", totalFetched-len(requestIDs))
 
-	if err := delete_enrollement_request.DeleteEnrollmentRequests(as, requestIDs); err != nil {
+	if err := delete_enrollement_request.DeleteEnrollmentRequestsWithProgress(as, requestIDs); err != nil {
 		slog.Error("deleting enrollment requests failed", "err", err)
 		os.Exit(1)
 	}
@@ -274,7 +274,6 @@ func buildExcludeUserIDs(as *types.AppState) map[string]struct{} {
 	excludeUserIDs := make(map[string]struct{}, len(as.ExcludeEmails))
 
 	for _, email := range as.ExcludeEmails {
-		email := email
 		pool.Submit(func() {
 			user, err := finduserbyemail.FindUserByEmail(as, email)
 			if err != nil {
