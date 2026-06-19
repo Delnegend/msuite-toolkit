@@ -51,7 +51,19 @@ func writeUserDevicesCSV(outputPath *string, users []types.UserInfo, userDevices
 	w.Comma = '|'
 	defer w.Flush()
 
-	if err := w.Write([]string{"UserID", "UserEmail", "DeviceID", "DeviceName", "DeviceType", "LastUsed"}); err != nil {
+	if err := w.Write([]string{
+		"UserID",
+		"UserEmail",
+		"DomainID",
+		"DeviceID",
+		"DeviceName",
+		"DeviceType",
+		"ProductName",
+		"AgentVersion",
+		"DeviceStatus",
+		"OS",
+		"LastUsed",
+	}); err != nil {
 		slog.Error("writing csv header failed", "err", err)
 		os.Exit(1)
 	}
@@ -65,9 +77,14 @@ func writeUserDevicesCSV(outputPath *string, users []types.UserInfo, userDevices
 			if err := w.Write([]string{
 				user.UserID,
 				user.UserEmail,
+				device.DomainID,
 				device.DeviceID,
 				device.DeviceName,
+				device.Type,
 				device.MetaData.ProductName,
+				device.AgentVersion,
+				device.DeviceStatus,
+				device.MetaData.OS,
 				device.UpdatedTimeString(),
 			}); err != nil {
 				slog.Error("writing csv row failed", "err", err)

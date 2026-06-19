@@ -1,7 +1,7 @@
 # M-Suite User Devices Data Extraction CLI Usage
 
 ## Description
-This tool extracts a list of all devices associated with each user in the system. The output CSV includes User ID, Email, Device ID, Device Name, Device Type, and the Last Used timestamp for each device.
+This tool extracts a list of all devices associated with each user in the system. The output CSV includes User ID, Email, Domain ID, Device ID, Device Name, Device Type, Product Name, Agent Version, Device Status, OS, and the Last Used timestamp for each device.
 
 ## Quick steps
 - Ensure M-Suite is open, turned on, and the Admin Portal app is present in the app list.
@@ -30,5 +30,5 @@ After filling `config.toml`, run:
 ./get-user-devices.exe
 ```
 
-Use `-config` to point to a different config file and `-output` to change the output file. The output CSV is pipe-separated and includes the following columns: `UserID`, `UserEmail`, `DeviceID`, `DeviceName`, `DeviceType`, `LastUsed`.
+Use `-config` to point to a different config file and `-output` to change the output file. The output CSV is pipe-separated and includes the following columns: `UserID`, `UserEmail`, `DomainID`, `DeviceID`, `DeviceName`, `DeviceType`, `ProductName`, `AgentVersion`, `DeviceStatus`, `OS`, `LastUsed`.
 

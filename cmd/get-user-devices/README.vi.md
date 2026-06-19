@@ -1,7 +1,7 @@
 # Công cụ trích xuất dữ liệu thiết bị người dùng M-Suite
 
 ## Mô tả
-Công cụ này trích xuất danh sách tất cả các thiết bị liên kết với từng người dùng trong hệ thống. File CSV đầu ra bao gồm User ID, Email, Device ID, Tên thiết bị, Loại thiết bị và thời điểm sử dụng lần cuối (Last Used) cho mỗi thiết bị.
+Công cụ này trích xuất danh sách tất cả các thiết bị liên kết với từng người dùng trong hệ thống. File CSV đầu ra bao gồm User ID, Email, Domain ID, Device ID, Tên thiết bị, Loại thiết bị, Product Name, Agent Version, Device Status, OS và thời điểm sử dụng lần cuối (Last Used) cho mỗi thiết bị.
 
 ## Các bước nhanh
 - Đảm bảo M-Suite đang mở, đã bật, và ứng dụng Admin Portal xuất hiện trong danh sách ứng dụng.
@@ -30,4 +30,4 @@ Sau khi điền `config.toml`, chạy:
 ./get-user-devices.exe
 ```
 
-Dùng `-config` để chỉ file config khác và `-output` để đổi tên file đầu ra. File đầu ra CSV phân tách bằng dấu `|` và bao gồm các cột sau: `UserID`, `UserEmail`, `DeviceID`, `DeviceName`, `DeviceType`, `LastUsed`.
+Dùng `-config` để chỉ file config khác và `-output` để đổi tên file đầu ra. File đầu ra CSV phân tách bằng dấu `|` và bao gồm các cột sau: `UserID`, `UserEmail`, `DomainID`, `DeviceID`, `DeviceName`, `DeviceType`, `ProductName`, `AgentVersion`, `DeviceStatus`, `OS`, `LastUsed`.
